@@ -46,7 +46,7 @@ const PORT = process.env.AGENT_PORT || 3456;
  */
 async function initializeAgent() {
   try {
-    console.log(`🚀 Initializing Circular Browser Automation Agent`);
+    console.log(`🚀 Initializing Kaocular Browser Automation Agent`);
     
     stagehand = new StagehandWithBrowserTools({
       env: 'LOCAL',
@@ -180,7 +180,7 @@ async function executeBrowserCommand(command: string, params: any): Promise<any>
 app.get('/health', (req, res) => {
   res.json({ 
     status: isReady ? 'ready' : 'initializing',
-    service: 'Circular Browser Automation Agent (Cursor-powered)',
+    service: 'Kaocular Browser Automation Agent (Cursor-powered)',
     port: PORT
   });
 });
@@ -382,7 +382,7 @@ app.post('/shutdown', async (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`🌐 Circular Agent Server starting on http://localhost:${PORT}`);
+  console.log(`🌐 Kaocular Agent Server starting on http://localhost:${PORT}`);
   initializeAgent();
 });
 

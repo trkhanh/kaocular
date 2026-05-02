@@ -1,16 +1,16 @@
 export const SITE_CONFIG = {
-  name: "Circular",
+  name: "Kaocular",
   description: "Agentic browser testing for AI-native IDEs. Natural language commands meet DevTools monitoring depth.",
-  url: "https://circular.dev",
+  url: "https://kaocular.dev",
   ogImage: "/og-image.png",
-  creator: "@circular",
+  creator: "@kaocular",
 }
 
 export const HERO_CONTENT = {
   headline: "EMPOWERING AGENTIC",
   subheadline: "BROWSER TESTING",
   tagline: "NATURAL LANGUAGE MEETS DEVTOOLS DEPTH",
-  description: "Circular is an agentic browser testing extension for AI-native IDEs, combining natural language simplicity with comprehensive DevTools monitoring.",
+  description: "Kaocular is an agentic browser testing extension for AI-native IDEs, combining natural language simplicity with comprehensive DevTools monitoring.",
   primaryCTA: "START TESTING",
   secondaryCTA: "VIEW DEMO",
 }

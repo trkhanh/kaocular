@@ -21,7 +21,7 @@ const orbitron = Orbitron({
 })
 
 export const metadata = {
-  title: 'Circular - AI-Powered Browser Testing',
+  title: 'Kaocular - AI-Powered Browser Testing',
   description: 'Agentic browser testing for AI-native IDEs. Natural language commands meet DevTools monitoring depth.',
 }
 

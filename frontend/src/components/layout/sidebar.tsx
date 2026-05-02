@@ -32,7 +32,7 @@ export function Sidebar() {
               </svg>
             </div>
             <span className="ml-3 text-xl font-semibold text-gray-900 dark:text-white font-orbitron">
-              Circular
+              Kaocular
             </span>
           </Link>
         </div>

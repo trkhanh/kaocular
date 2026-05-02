@@ -34,7 +34,7 @@ export default function HomePage() {
                   <path d="M2 12L12 17L22 12"/>
                 </svg>
               </div>
-              <span className="text-xl font-bold tracking-wider font-orbitron">CIRCULAR</span>
+              <span className="text-xl font-bold tracking-wider font-orbitron">KAOCULAR</span>
             </a>
             
                 <div className="hidden md:flex items-center space-x-8 text-sm tracking-wide font-orbitron">
@@ -83,7 +83,7 @@ export default function HomePage() {
             </div>
 
             <div className="max-w-md">
-              <h2 className="text-lg font-semibold text-white mb-4 tracking-wide font-orbitron">WE ARE CIRCULAR</h2>
+              <h2 className="text-lg font-semibold text-white mb-4 tracking-wide font-orbitron">WE ARE KAOCULAR</h2>
               <p className="text-white leading-relaxed">
                 {HERO_CONTENT.description}
               </p>
@@ -231,12 +231,12 @@ export default function HomePage() {
                   <path d="M2 12L12 17L22 12"/>
                 </svg>
               </div>
-              <span className="text-xl font-bold tracking-wider font-orbitron">CIRCULAR</span>
+              <span className="text-xl font-bold tracking-wider font-orbitron">KAOCULAR</span>
             </div>
             
                 <div className="flex items-center space-x-8 text-sm font-orbitron">
                   <span className="text-white tracking-wide">
-                    © 2025 CIRCULAR. ALL RIGHTS RESERVED.
+                    © 2025 KAOCULAR. ALL RIGHTS RESERVED.
                   </span>
                 </div>
           </div>

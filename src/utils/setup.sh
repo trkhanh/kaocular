@@ -667,7 +667,7 @@ check_and_setup_ollama() {
 
 # Main function
 main() {
-    echo "🚀 Circular Project Setup"
+    echo "🚀 Kaocular Project Setup"
     echo "========================="
     echo ""
     

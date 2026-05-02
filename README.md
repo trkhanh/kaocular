@@ -1,18 +1,18 @@
-# Circular
+# Kaocular
 
 **Close The Loop Between Vibe Coding and Software Testing**
 
-Circular extends Cursor and other AI-powered IDEs with intelligent browser testing capabilities, combining natural language commands with comprehensive DevTools monitoring and learning from past solutions. Watch a demo here: https://www.youtube.com/watch?v=cdstzuBHT40
+Kaocular extends Cursor and other AI-powered IDEs with intelligent browser testing capabilities, combining natural language commands with comprehensive DevTools monitoring and learning from past solutions. Watch a demo here: https://www.youtube.com/watch?v=cdstzuBHT40
 
 ---
 
 ## Inspiration  
 
-Circular works as an extension for AI-native IDEs, offering an agentic approach to browser testing that combines the simplicity of natural language commands with the depth of DevTools monitoring. The inspiration for this project came from two of our team members, who had written over 300,000 lines of "vibe coding" while working at a startup this summer. They experienced firsthand the limitations of Cursor, particularly that it couldn't actually test the code it generated.  
+Kaocular works as an extension for AI-native IDEs, offering an agentic approach to browser testing that combines the simplicity of natural language commands with the depth of DevTools monitoring. The inspiration for this project came from two of our team members, who had written over 300,000 lines of "vibe coding" while working at a startup this summer. They experienced firsthand the limitations of Cursor, particularly that it couldn't actually test the code it generated.  
 
 ## What it does  
 
-Circular solves Cursor's primary flaw: **it can't verify if its code works**. Our agent runs tests in the browser, monitors DevTools for issues, and learns from past solutions to solve similar bugs more efficiently. This makes Cursor's vibe coding workflow more robust by adding actual validation and memory of prior fixes. As this is integrated into AI-Native IDEs like Cursor through editing the Cursor rules, Circular's testing provides an additional layer of quality assurance and greatly streamlines the debugging process
+Kaocular solves Cursor's primary flaw: **it can't verify if its code works**. Our agent runs tests in the browser, monitors DevTools for issues, and learns from past solutions to solve similar bugs more efficiently. This makes Cursor's vibe coding workflow more robust by adding actual validation and memory of prior fixes. As this is integrated into AI-Native IDEs like Cursor through editing the Cursor rules, Kaocular's testing provides an additional layer of quality assurance and greatly streamlines the debugging process
 
 **Key Features:**
 - **Natural Language Testing** - "Click the login button and verify it works"
@@ -43,7 +43,7 @@ We built our agent using **Stagehand** (built on Playwright) to automate browser
 
 ## Accomplishments that we're proud of  
 
-We're proud to have built a product that **meaningfully improves on Cursor**, one of the most popular AI coding tools today. Circular integrates seamlessly into Cursor, enhances its capabilities, and has the potential to revolutionize coding workflows by bridging the gap between vibe coding and validation.  
+We're proud to have built a product that **meaningfully improves on Cursor**, one of the most popular AI coding tools today. Kaocular integrates seamlessly into Cursor, enhances its capabilities, and has the potential to revolutionize coding workflows by bridging the gap between vibe coding and validation.  
 
 ## What we learned  
 
@@ -52,7 +52,7 @@ We're proud to have built a product that **meaningfully improves on Cursor**, on
 - How to design embedding-based retrieval for problem–solution matching
 - How critical context management is when working with AI-native IDEs
 
-## What's next for Circular  
+## What's next for Kaocular  
 
 - **Performance**: Improved speed and efficiency
 - **Voice Testing**: Support for voice-based model testing  
@@ -62,7 +62,7 @@ We're proud to have built a product that **meaningfully improves on Cursor**, on
 
 ## Web Dashboard
 
-Circular includes a comprehensive **Next.js dashboard** that provides real-time visibility into all your browser automation activities:
+Kaocular includes a comprehensive **Next.js dashboard** that provides real-time visibility into all your browser automation activities:
 
 ### Dashboard Features:
 - **Overview Dashboard** - System statistics, recent runs, and activity summaries
@@ -94,7 +94,7 @@ The dashboard updates in real-time as your agent runs tests, providing immediate
 
 ### 1. Database Setup (Supabase)
 
-Circular uses **PostgreSQL with pgVector** for storing logs and semantic search. You can use Supabase (recommended) or your own PostgreSQL instance.
+Kaocular uses **PostgreSQL with pgVector** for storing logs and semantic search. You can use Supabase (recommended) or your own PostgreSQL instance.
 
 #### Option A: Supabase (Recommended)
 
@@ -120,7 +120,7 @@ Circular uses **PostgreSQL with pgVector** for storing logs and semantic search.
 1. **Install PostgreSQL** with pgVector extension
 2. **Create Database** and enable extensions:
    ```sql
-   CREATE DATABASE circular;
+   CREATE DATABASE kaocular;
    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
    CREATE EXTENSION IF NOT EXISTS "pg_trgm";
    CREATE EXTENSION IF NOT EXISTS "vector";
@@ -251,7 +251,7 @@ agent.bat --run         # Windows
 ## 📊 Project Structure
 
 ```
-circular/
+kaocular/
 ├── src/
 │   ├── agent/                   # Core agent system
 │   │   ├── agent-server.ts     # Main agent server
@@ -269,7 +269,7 @@ circular/
 
 ## Contributing
 
-We welcome contributions! Whether you're fixing bugs, adding features, or improving documentation, every contribution helps make Circular better for the entire AI coding community.
+We welcome contributions! Whether you're fixing bugs, adding features, or improving documentation, every contribution helps make Kaocular better for the entire AI coding community.
 
 ## License
 

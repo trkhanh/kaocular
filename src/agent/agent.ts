@@ -90,7 +90,7 @@ function runAgentTest(args: string[]) {
 function showHelp() {
   console.log(`
 ╔════════════════════════════════════════════════════════════════╗
-║     Circular - Cursor-Powered Browser Automation Agent        ║
+║     Kaocular - Cursor-Powered Browser Automation Agent        ║
 ╚════════════════════════════════════════════════════════════════╝
 
 Usage: pnpm agent [command] [options]
