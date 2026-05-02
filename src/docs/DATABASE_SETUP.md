@@ -26,7 +26,7 @@ This guide covers the complete setup for Prisma, Supabase (local), pgvector embe
 ### 🔍 Search Capabilities
 - **Text Similarity**: Fuzzy text matching using trigrams
 - **Full-Text Search**: PostgreSQL's built-in text search with ranking
-- **Vector Similarity**: Semantic search using embeddings (OpenAI compatible)
+- **Vector Similarity**: Semantic search using embeddings (Ollama)
 - **Hybrid Search**: Combines text and vector search for best results
 
 ### 🚀 Features
@@ -67,8 +67,6 @@ cp env.sample .env
 ```
 
 Required keys:
-- `CEREBRAS_API_KEY` (for AI)
-- `OPENAI_API_KEY` (for embeddings)
 - `BROWSERBASE_API_KEY` (optional, for cloud browser)
 
 ### 5. Setup Database
@@ -189,10 +187,9 @@ When running, the following services are available:
    pnpm db:push
    ```
 
-4. **API key issues**
-   - Check your `.env` file has the correct keys
-   - Ensure OpenAI API key is set for embeddings
-   - Verify Cerebras API key is set
+4. **Environment variable issues**
+   - Check your `.env` file has the correct configuration
+   - Ensure Ollama URL is configured for embeddings
 
 ### Reset Everything
 ```bash

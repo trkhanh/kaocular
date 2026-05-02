@@ -28,7 +28,7 @@ We built our agent using **Stagehand** (built on Playwright) to automate browser
 
 ### Tech Stack:
 - **Browser Automation**: Stagehand + Playwright for natural language browser control
-- **LLMs**: Cerebras API and open-source models for intelligent test generation
+- **LLMs**: Local open-source models for intelligent test generation
 - **Embeddings**: Local Ollama server (embedding-gemma) for efficient similarity matching
 - **Database**: PostgreSQL with pgVector for semantic search capabilities
 - **Frontend**: Next.js dashboard for real-time monitoring and management
@@ -213,10 +213,7 @@ cp env.sample .env
 # Database (from Supabase or your PostgreSQL instance)
 DATABASE_URL="postgresql://postgres:[password]@[host]:6543/postgres?pgbouncer=true"
 
-# AI Provider (choose one)
-ANTHROPIC_API_KEY="your_key_here"     # Recommended
-OPENAI_API_KEY="your_key_here"        # Alternative
-CEREBRAS_API_KEY="your_key_here"      # Fast & cost-effective
+
 
 # Optional: Embeddings service (if using local Ollama)
 OLLAMA_BASE_URL="http://localhost:11434"

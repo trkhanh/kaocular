@@ -4,7 +4,7 @@ import { saveFailedRequestsToFile, formatFailedRequestsSummary } from '../utils/
 
 /**
  * Example showing how to use the agent functionality with browser monitoring
- * Works with both Gemini and Anthropic providers
+ * Works with local AI models
  */
 async function runAgentWithBrowserTools() {
   const providerInfo = getProviderInfo();

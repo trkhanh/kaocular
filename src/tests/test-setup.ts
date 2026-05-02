@@ -17,7 +17,7 @@ async function testSetup() {
   } catch (error) {
     console.error('❌ No API key found in .env file');
     console.log('Please create a .env file with:');
-    console.log('  CEREBRAS_API_KEY=your_key_here');
+    console.log('  OLLAMA_BASE_URL=http://localhost:11434');
     process.exit(1);
   }
 
@@ -73,7 +73,7 @@ async function testSetup() {
   } catch (error) {
     console.error('❌ Test failed:', error);
     console.log('\nTroubleshooting:');
-    console.log('1. Check your API key (CEREBRAS_API_KEY) is valid');
+    console.log('1. Check your local AI model configuration');
     console.log('2. Ensure Chrome/Chromium is installed');
     console.log('3. Run: pnpm install');
     process.exit(1);

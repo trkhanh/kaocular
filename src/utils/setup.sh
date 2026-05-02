@@ -54,24 +54,7 @@ prompt_api_keys() {
         fi
     }
     
-    # Check if CEREBRAS_API_KEY already exists and is not placeholder
-    if grep -q "^CEREBRAS_API_KEY=" .env && ! grep -q "^CEREBRAS_API_KEY=your_cerebras_api_key_here" .env && ! grep -q "^CEREBRAS_API_KEY=$" .env; then
-        print_success "Cerebras API key already configured"
-    else
-        # Prompt for Cerebras API key (securely)
-        echo ""
-        echo -e "${YELLOW}⚠️  Cerebras API key is required${NC}"
-        echo -e "${BLUE}Please enter your CEREBRAS_API_KEY (input will be hidden):${NC}"
-        read -rs cerebras_key
-        if [ ! -z "$cerebras_key" ]; then
-            update_env "CEREBRAS_API_KEY" "$cerebras_key"
-            print_success "Cerebras API key set"
-        else
-            print_error "Cerebras API key is required. Please run setup again."
-            exit 1
-        fi
-    fi
-    
+
     # Read ports from config.toml if it exists
     if [ -f "../supabase/config.toml" ]; then
         API_PORT=$(grep -A1 "^\[api\]" ../supabase/config.toml | grep "^port =" | sed 's/port = //')
