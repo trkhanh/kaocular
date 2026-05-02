@@ -60,6 +60,76 @@ We're proud to have built a product that **meaningfully improves on Cursor**, on
 - **Local Models**: Running the browser agent fully on local models
 - **Accessibility**: Expanding access so that every coder can use it
 
+---
+
+## 🔗 Cursor Integration
+
+Kaocular integrates with **Cursor** (and other AI-native IDEs) not through a plugin or extension, but through a powerful and simple mechanism: **Cursor Rules** (`.cursor/rules/`).
+
+### How It Works
+
+The integration lives in two files:
+
+| File | `alwaysApply` | Effect |
+|------|--------------|--------|
+| `.cursor/rules/global.mdc` | `true` | Automatically injected into **every** Cursor AI conversation |
+| `.cursor/rules/general.mdc` | `false` | Injected on demand / for specific contexts |
+
+Because `global.mdc` has `alwaysApply: true`, Cursor's AI receives ~1,600 lines of strict testing rules **invisibly prepended** to every chat — before it even reads your message. No configuration needed beyond placing the file.
+
+### What the Rules Tell Cursor's AI
+
+The injected rules impose a **mandatory development workflow** that Cursor's AI must follow for every feature:
+
+```
+1. Receive feature request  →  Create a todo list
+2. Implement one sub-feature at a time
+3. Test with agent.sh (MANDATORY before moving on):
+      ./agent.sh --test -context "..." "test instruction"
+4. If errors occur  →  Search the knowledge base:
+      ./agent.sh --retrieve --input "error description"
+5. Fix the issue, re-test, then store the solution:
+      ./agent.sh --store --issue "..." --solution "..." --tags ...
+6. Repeat until all items are complete
+```
+
+The key rule is: **NEVER move to the next item without testing the current one.**
+
+### The Full Integrated Loop
+
+```
+You:        "Add a login form"
+              ↓
+Cursor:     Prepends global.mdc rules invisibly
+              ↓
+Cursor AI:  Writes the login form code
+              ↓
+Cursor AI:  Runs in terminal →  ./agent.sh --test "Click login and verify"
+              ↓
+agent.sh:   Hits Agent Server (port 3456) → Playwright opens browser
+              ↓
+Browser:    Executes the test, captures console logs + network errors
+              ↓
+Cursor AI:  Reads the output, fixes failures, re-tests
+              ↓
+Cursor AI:  Stores the fix → ./agent.sh --store --issue "..." --solution "..."
+```
+
+### Key Insight: No Plugin Required
+
+There is **no LLM API key** used during normal Cursor-integrated operation. The Agent Server (`agent-server.ts`) explicitly has **no LLM** — it is a pure browser executor:
+
+```typescript
+/**
+ * Initialize Stagehand browser (no LLM)
+ */
+async function initializeAgent() { ... }
+```
+
+**Cursor's own AI is the LLM.** Kaocular simply gives it eyes (a real browser) and a memory (the knowledge base), turning Cursor into a self-validating coding agent.
+
+---
+
 ## Web Dashboard
 
 Kaocular includes a comprehensive **Next.js dashboard** that provides real-time visibility into all your browser automation activities:
