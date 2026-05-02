@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgTrgm(map: "pg_trgm", schema: "extensions"), uuidOssp(map: "uuid-ossp", schema: "extensions"), vector(schema: "extensions")]
+}
+
+model Log {
+  id           String    @id @default(uuid())
+  issueText    String    @map("issue_text")
+  solutionText String?   @map("solution_text")
+  tags         String[]
+  timestamp    DateTime  @default(now())
+  metadata     Json?
+  
+  // Embeddings with pgvector - exactly like the example
+  embeddingGeneratedAt DateTime? @map("embedding_generated_at")
+  embedding            Unsupported("vector")?
+  
+  // Full-text search with tsvector - EXACTLY like the example
+  textSearch   Unsupported("tsvector")? @default(dbgenerated("to_tsvector('english'::regconfig, issue_text)")) @map("text_search")
+  
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  
+  @@map("logs")
+  @@index([textSearch])
+  @@index([timestamp])
+  @@index([tags])
+  @@index([embedding])
+}

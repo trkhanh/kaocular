@@ -1,0 +1,887 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions", "tracing"]
+  binaryTargets   = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+  extensions = [pg_trgm, uuid_ossp(map: "uuid-ossp", schema: "extensions"), vector(schema: "extensions")]
+}
+
+model Interaction {
+  id                   String                   @id @default(uuid())
+  userId               String?
+  orgId                String?
+  campaignId           String?
+  timestamp            DateTime                 @default(now())
+  source               SourceType
+  text                 String
+  metadata             Json?
+  embeddingGeneratedAt DateTime?
+  embedding            Unsupported("vector")?
+  deleted              Boolean                  @default(false)
+  deletedAt            DateTime?
+  interviewId          String?
+  textSearch           Unsupported("tsvector")? @default(dbgenerated("to_tsvector('english'::regconfig, text)"))
+  campaign             Campaign?                @relation(fields: [campaignId], references: [id])
+  interview            Interview?               @relation(fields: [interviewId], references: [id])
+  organization         Organization?            @relation(fields: [orgId], references: [id])
+  user                 User?                    @relation(fields: [userId], references: [id])
+
+  @@index([textSearch])
+  @@index([userId])
+  @@index([orgId])
+  @@index([campaignId])
+  @@index([interviewId])
+  @@index([source])
+  @@index([timestamp])
+}
+
+model User {
+  id                        String                   @id @default(uuid())
+  email                     String?                  @unique
+  createdAt                 DateTime                 @default(now())
+  bio                       String?
+  linkedinUrl               String?                  @unique
+  username                  String?                  @unique
+  twitterUrl                String?                  @unique
+  genericUrl                String?
+  latitude                  Float?
+  longitude                 Float?
+  banned                    Boolean                  @default(false)
+  firstName                 String?
+  lastActiveAt              DateTime?
+  lastName                  String?
+  lastSignInAt              DateTime?
+  locked                    Boolean                  @default(false)
+  gender                    String?
+  sex                       String?
+  ethnicity                 String?
+  countryOfBirth            String?
+  countryOfResidence        String?
+  nationality               String?
+  primaryLanguage           String                   @default("English")
+  studentStatus             String?
+  employmentStatus          String?
+  employmentRole            String?
+  primaryPhoneNumber        String?
+  notificationPreferences   Json?                    @default("{\"surveySent\":[\"EMAIL\",\"IN_APP\"],\"surveyPublished\":[],\"digest\":[\"EMAIL\"]}")
+  privateMetadata           Json?
+  publicMetadata            Json?
+  updatedAt                 DateTime                 @updatedAt
+  birthDate                 DateTime?
+  twoFactorEnabled          Boolean                  @default(false)
+  authInAt                  DateTime?
+  osintAt                   DateTime?
+  prolificId                String?                  @unique
+  banExpires                DateTime?
+  banReason                 String?
+  displayUsername           String?
+  emailVerified             Boolean                  @default(false)
+  image                     String?
+  name                      String
+  role                      String                   @default("user")
+  completedOnboarding       Boolean                  @default(false)
+  deleted                   Boolean                  @default(false)
+  deletedAt                 DateTime?
+  currentBalance            Decimal                  @default(0.00) @db.Decimal(10, 2)
+  lastReconciliationAt      DateTime?
+  stripeConnectAccountId    String?                  @unique
+  stripeIdentitySessionId   String?                  @unique
+  totalEarnings             Decimal                  @default(0.00) @db.Decimal(10, 2)
+  totalWithdrawn            Decimal                  @default(0.00) @db.Decimal(10, 2)
+  verificationFailureReason String?
+  verificationStatus        VerificationStatus       @default(UNVERIFIED)
+  accounts                  Account[]
+  campaignChats             CampaignChat[]
+  analysisChats             AnalysisChat[]
+  evaluations               ContactEvaluation[]
+  earningsCalculations      EarningsCalculation[]
+  googleFormsIntegrations   GoogleFormsIntegration[]
+  googleUserTokens          GoogleUserTokens?
+  Interaction               Interaction[]
+  interviews                Interview[]
+  invitations               Invitation[]
+  memberships               Member[]
+  notifications             Notification[]
+  receivedEmails            OutboundEmail[]          @relation("ReceivedEmails")
+  sentEmails                OutboundEmail[]          @relation("SentEmails")
+  reports                   Report[]
+  sessions                  Session[]
+  transactions              Transaction[]
+  twoFactor                 TwoFactor[]
+  Chat                      Chat[]
+}
+
+model TwoFactor {
+  id          String @id @default(uuid())
+  secret      String
+  backupCodes String
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id                   String   @id @default(cuid())
+  userAgent            String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  activeOrganizationId String?
+  expiresAt            DateTime
+  impersonatedBy       String?
+  ipAddress            String?
+  token                String   @unique
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Organization {
+  id                       String              @id @default(uuid())
+  name                     String
+  slug                     String              @unique
+  stripeCustomerId         String?             @unique @map("stripe_customer_id")
+  stripeSubscriptionId     String?             @unique @map("stripe_subscription_id")
+  stripePriceId            String?             @map("stripe_price_id")
+  stripeCurrentPeriodEnd   DateTime?           @map("stripe_current_period_end")
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+  creditsBalance           Float               @default(100) @map("credits_balance")
+  creditsPeriodEnd         DateTime?           @map("credits_period_end")
+  creditsPeriodStart       DateTime?           @map("credits_period_start")
+  creditsPlanLimit         Float               @default(100) @map("credits_plan_limit")
+  creditsUsedCurrentPeriod Float               @default(0) @map("credits_used_current_period")
+  planType                 PlanType            @default(FREE) @map("plan_type")
+  paymentMethodBrand       String?             @map("payment_method_brand")
+  paymentMethodExpMonth    Int?                @map("payment_method_exp_month")
+  paymentMethodExpYear     Int?                @map("payment_method_exp_year")
+  paymentMethodLast4       String?             @map("payment_method_last4")
+  deleted                  Boolean             @default(false)
+  deletedAt                DateTime?
+  hasPendingPlanChange     Boolean             @default(false) @map("has_pending_plan_change")
+  pendingPlanEffectiveDate DateTime?           @map("pending_plan_effective_date")
+  pendingPlanType          PlanType?           @map("pending_plan_type")
+  logo                     String?
+  organizationUrl          String?
+  brandfetchId             String?
+  brandfetchCache          Json?
+  metadata                 Json?
+  autoTopupEnabled         Boolean             @default(false) @map("auto_topup_enabled")
+  autoTopupLastCheck       DateTime?           @map("auto_topup_last_check")
+  autoTopupTargetAmount    Float?              @map("auto_topup_target_amount")
+  autoTopupThreshold       Float?              @map("auto_topup_threshold")
+  contactEvaluations       ContactEvaluation[]
+  creditTransactions       CreditTransaction[]
+  Interaction              Interaction[]
+  interviews               Interview[]
+  invitations              Invitation[]
+  memberships              Member[]
+  outboundEmails           OutboundEmail[]
+  projects                 Project[]
+  reports                  Report[]
+  teams                    Team[]
+
+  @@index([slug])
+}
+
+model Team {
+  id             String       @id @default(uuid())
+  name           String
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  invitations    Invitation[]
+  members        Member[]
+  projects       Project[]
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+}
+
+model CreditTransaction {
+  id              String       @id @default(uuid())
+  organizationId  String
+  amount          Float
+  type            String
+  description     String?
+  interviewId     String?
+  stripePaymentId String?
+  createdAt       DateTime     @default(now())
+  interview       Interview?   @relation(fields: [interviewId], references: [id])
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Member {
+  id                 String              @id @default(uuid())
+  userId             String
+  organizationId     String
+  teamId             String?
+  role               String              @default("member")
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  deleted            Boolean             @default(false)
+  deletedAt          DateTime?
+  contactEvaluations ContactEvaluation[]
+  interviews         Interview[]
+  organization       Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team               Team?               @relation(fields: [teamId], references: [id])
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+}
+
+model Invitation {
+  id             String       @id @default(uuid())
+  organizationId String
+  teamId         String?
+  email          String
+  role           String       @default("member")
+  status         String       @default("pending")
+  expiresAt      DateTime
+  inviterId      String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  inviter        User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team           Team?        @relation(fields: [teamId], references: [id])
+
+  @@index([organizationId])
+  @@index([email])
+}
+
+model Project {
+  id             String       @id @default(uuid())
+  name           String
+  createdAt      DateTime     @default(now())
+  slug           String       @unique
+  organizationId String
+  deleted        Boolean      @default(false)
+  deletedAt      DateTime?
+  teamId         String?
+  campaigns      Campaign[]
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team           Team?        @relation(fields: [teamId], references: [id])
+
+  @@unique([organizationId, slug])
+}
+
+model Campaign {
+  id                          String                     @id @default(uuid())
+  name                        String
+  status                      CampaignStatus             @default(LIVE)
+  createdAt                   DateTime                   @default(now())
+  projectId                   String
+  slug                        String                     @unique
+  type                        CampaignType
+  updatedAt                   DateTime                   @default(now())
+  deleted                     Boolean                    @default(false)
+  num_providers               Int                        @default(0)
+  deletedAt                   DateTime?
+  statusBeforeNegativeBalance CampaignStatus?
+  description                 String                     @default("")
+  project                     Project                    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  contactEvaluations          ContactEvaluation[]
+  googleFormsIntegration      GoogleFormsIntegration?
+  insights                    Insight[]
+  Interaction                 Interaction[]
+  interviews                  Interview[]
+  interviewPlatformCampaign   InterviewPlatformCampaign?
+  outboundEmails              OutboundEmail[]
+  peopleSearchCampaign        PeopleSearchCampaign?
+  reports                     Report[]
+  transactions                Transaction[]
+  sourcingApprovals           CampaignSourcingApproval[]
+
+  @@index([projectId])
+}
+
+model Insight {
+  id           String               @id @default(cuid())
+  campaignId   String
+  name         String
+  schema       Json?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  description  String
+  type         String
+  questionId   String?
+  campaign     Campaign             @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  observations InsightObservation[]
+
+  @@index([campaignId])
+  @@index([questionId])
+  @@index([name])
+}
+
+model InsightObservation {
+  id                   String                 @id @default(cuid())
+  insightId            String
+  interviewId          String
+  fileUploadId         String? // Optional: link to a specific file upload
+  structuredAnswer     String?
+  rationale            String?
+  embeddingGeneratedAt DateTime?
+  confidence           Float?
+  judgeType            String
+  transcriptEvidence   String? // Contains relevant transcript portions used for grading this insight
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  embedding            Unsupported("vector")?
+  insight              Insight                @relation(fields: [insightId], references: [id], onDelete: Cascade)
+  interview            Interview              @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  fileUpload           FileUpload?            @relation(fields: [fileUploadId], references: [id], onDelete: SetNull)
+
+  @@unique([insightId, interviewId])
+  @@index([insightId])
+  @@index([interviewId])
+  @@index([fileUploadId])
+}
+
+model PeopleSearchCampaign {
+  id                 String             @id @default(uuid())
+  campaignId         String             @unique
+  exaWebsetsId       String?
+  exaEnrichments     Json?
+  config             Json?
+  createdAt          DateTime           @default(now())
+  contactsEnriched   Int                @default(0)
+  contactsFound      Int                @default(0)
+  contactsJudged     Int                @default(0)
+  progressPercentage Int                @default(0)
+  status             PeopleSearchStatus @default(PENDING)
+  statusMessage      String?
+  updatedAt          DateTime           @updatedAt
+  deleted            Boolean            @default(false)
+  deletedAt          DateTime?
+  campaign           Campaign           @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+}
+
+model InterviewPlatformCampaign {
+  id                      String                @id @default(cuid())
+  campaignId              String                @unique
+  discussionGuide         Json?
+  inviteToken             String?               @unique @default(cuid())
+  externalStudyId         String?               @unique
+  externalStudyProvider   String?
+  externalStudyUrl        String?
+  completionCodeFail      String?               @unique
+  completionCodeSuccess   String?               @unique
+  prolificPaymentStatus   ProlificPaymentStatus @default(UNPAID)
+  prolificStripePaymentId String?               @unique
+  screenShareRequired     MediaRequirement?     @default(NONE)
+  videoRequired           MediaRequirement?     @default(NONE)
+  isListed                Boolean               @default(false)
+  analysis                Json?
+  selectedFilters         Json?
+  maxOneResponse          Boolean               @default(true)
+  deleted                 Boolean               @default(false)
+  deletedAt               DateTime?
+  displayInsightsToUser   Boolean               @default(true)
+  insightAnalysisEnabled  Boolean               @default(true)
+  stimulusEnabled         Boolean               @default(false)
+  insightIds              String[]
+  chat                    Json?
+  expert                  String[]              @default([])
+  naturalLanguageQuery    String                @default("")
+  totalBudget             Decimal?              @db.Decimal(10, 2)
+  usedBudget              Decimal               @default(0.00) @db.Decimal(10, 2)
+  interviewPaymentAmount  Decimal               @default(5.00) @db.Decimal(8, 2)
+  campaignChats           CampaignChat[]
+  analysisChats           AnalysisChat[]
+  interviews              Interview[]
+  campaign                Campaign              @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  Chat                    Chat[]
+
+  @@index([campaignId])
+}
+
+model CampaignSourcingApproval {
+  id                     String                 @id @default(cuid())
+  campaignId             String
+  requestedByUserId      String
+  status                 SourcingApprovalStatus @default(PENDING)
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  approvedByUserId       String?
+  approvedAt             DateTime?
+  decisionNote           String?
+  method                 SourcingMethod
+  participantCount       Int?
+  filters                Json?
+  requestedBudgetDollars Decimal?               @db.Decimal(10, 2)
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+}
+
+enum SourcingApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum SourcingMethod {
+  PROLIFIC
+  INTERNAL
+}
+
+model CampaignChat {
+  id                          String                    @id @default(uuid())
+  interviewPlatformCampaignId String
+  userId                      String?
+  role                        String
+  parts                       Json?
+  metadata                    Json?
+  createdAt                   DateTime                  @default(now())
+  updatedAt                   DateTime                  @updatedAt
+  interviewPlatformCampaign   InterviewPlatformCampaign @relation(fields: [interviewPlatformCampaignId], references: [id], onDelete: Cascade)
+  user                        User?                     @relation(fields: [userId], references: [id])
+
+  @@index([interviewPlatformCampaignId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([role])
+}
+
+model AnalysisChat {
+  id                          String                    @id @default(uuid())
+  interviewPlatformCampaignId String
+  userId                      String?
+  role                        String
+  parts                       Json?
+  metadata                    Json?
+  createdAt                   DateTime                  @default(now())
+  updatedAt                   DateTime                  @updatedAt
+  interviewPlatformCampaign   InterviewPlatformCampaign @relation(fields: [interviewPlatformCampaignId], references: [id], onDelete: Cascade)
+  user                        User?                     @relation(fields: [userId], references: [id])
+
+  @@index([interviewPlatformCampaignId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([role])
+}
+
+model Chat {
+  id                          String                    @id @default(uuid())
+  interviewPlatformCampaignId String
+  userId                      String
+  chat                        Json?
+  createdAt                   DateTime                  @default(now())
+  updatedAt                   DateTime                  @updatedAt
+  interviewPlatformCampaign   InterviewPlatformCampaign @relation(fields: [interviewPlatformCampaignId], references: [id], onDelete: Cascade)
+  user                        User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([interviewPlatformCampaignId, userId])
+  @@index([interviewPlatformCampaignId])
+  @@index([userId])
+  @@index([updatedAt])
+}
+
+model ChatMessage {
+  id                          String   @id @default(uuid())
+  campaignId                  String
+  interviewPlatformCampaignId String
+  role                        String
+  content                     String
+  toolCalls                   Json?
+  metadata                    Json?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  @@index([campaignId])
+  @@index([interviewPlatformCampaignId])
+  @@index([createdAt])
+}
+
+model Interview {
+  id                          String                     @id @default(uuid())
+  campaignId                  String?
+  userId                      String?
+  startedAt                   DateTime                   @default(now())
+  endedAt                     DateTime?
+  status                      InterviewStatus            @default(PENDING)
+  vapiCallId                  String?                    @unique
+  livekitRoomName             String?
+  livekitRoomSid              String?
+  livekitRecordingId          String?
+  duration                    Int?
+  inviteToken                 String?                    @unique
+  audioUrl                    String?
+  cameraRecordingS3Key        String?
+  screenRecordingS3Key        String?
+  transcript                  Json?
+  vapiCache                   Json?
+  livekitTranscript           Json?
+  organizationId              String?
+  ipAddress                   String?
+  city                        String?
+  country                     String?
+  latitude                    Float?
+  longitude                   Float?
+  interviewPlatformCampaignId String?
+  isProlificParticipant       Boolean                    @default(false)
+  deleted                     Boolean                    @default(false)
+  deletedAt                   DateTime?
+  memberId                    String?
+  insightGrades               Json?
+  isDemoInterview             Boolean                    @default(false)
+  // Budget deduction idempotency for campaign credits
+  budgetDeductedAt            DateTime?
+  budgetDeductedCredits       Decimal                    @default(0.00) @db.Decimal(10, 2)
+  creditTransactions          CreditTransaction[]
+  earningsCalculations        EarningsCalculation[]
+  fileUploads                 FileUpload[]
+  insightObservations         InsightObservation[]
+  interactions                Interaction[]
+  campaign                    Campaign?                  @relation(fields: [campaignId], references: [id])
+  InterviewPlatformCampaign   InterviewPlatformCampaign? @relation(fields: [interviewPlatformCampaignId], references: [id])
+  member                      Member?                    @relation(fields: [memberId], references: [id])
+  organization                Organization?              @relation(fields: [organizationId], references: [id])
+  user                        User?                      @relation(fields: [userId], references: [id])
+  transactions                Transaction[]
+
+  @@index([campaignId, deleted, startedAt])
+  @@index([status, deleted])
+  @@index([deleted, startedAt])
+}
+
+model Report {
+  id               String        @id @default(uuid())
+  campaignId       String
+  authorId         String
+  title            String
+  executiveSummary String
+  content          Json
+  createdAt        DateTime      @default(now())
+  organizationId   String?
+  pptxUrl          String?
+  deleted          Boolean       @default(false)
+  deletedAt        DateTime?
+  isPublic         Boolean       @default(true)
+  shareToken       String?
+  sharedAt         DateTime?
+  interviewsCount  Int?          // Number of interviews when this report was generated
+  author           User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  campaign         Campaign      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  organization     Organization? @relation(fields: [organizationId], references: [id])
+
+  @@index([shareToken, isPublic, deleted])
+}
+
+model ContactEvaluation {
+  id                       String        @id @default(uuid())
+  mission                  String
+  isRelevant               Boolean
+  relevanceScore           Int
+  reasoning                String
+  potentialValue           String
+  concerns                 String?
+  searchQuery              String
+  wasAccepted              Boolean
+  suggestedQuestions       Json
+  createdAt                DateTime      @default(now())
+  campaignId               String
+  userId                   String
+  organizationId           String?
+  organizationMembershipId String?
+  deleted                  Boolean       @default(false)
+  deletedAt                DateTime?
+  campaign                 Campaign      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  organization             Organization? @relation(fields: [organizationId], references: [id])
+  organizationMembership   Member?       @relation(fields: [organizationMembershipId], references: [id])
+  user                     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id         String           @id @default(uuid())
+  userId     String
+  type       NotificationType
+  title      String
+  message    String
+  data       Json?
+  read       Boolean          @default(false)
+  readAt     DateTime?
+  archived   Boolean          @default(false)
+  archivedAt DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([archived])
+  @@index([createdAt])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  email                 String? // Email from the OAuth provider
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([email])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+}
+
+model GoogleUserTokens {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  accessToken  String
+  refreshToken String
+  expiresAt    DateTime
+  scopes       String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GoogleFormsIntegration {
+  id                    String               @id @default(uuid())
+  campaignId            String               @unique
+  userId                String
+  formId                String
+  formTitle             String
+  lastSyncAt            DateTime?            @map("last_sync_at")
+  responseCount         Int                  @default(0)
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  importedResponseCount Int                  @default(0)
+  responses             GoogleFormResponse[]
+  campaign              Campaign             @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user                  User                 @relation(fields: [userId], references: [id])
+
+  @@index([campaignId])
+  @@index([userId])
+  @@index([formId])
+}
+
+model GoogleFormResponse {
+  id              String                 @id @default(uuid())
+  integrationId   String
+  responseId      String                 @unique
+  respondentEmail String?
+  submittedAt     DateTime
+  answers         Json
+  createdAt       DateTime               @default(now())
+  integration     GoogleFormsIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@index([integrationId])
+  @@index([submittedAt])
+}
+
+model FileUpload {
+  id          String    @id @default(uuid())
+  interviewId String
+  questionId  String
+  fileName    String
+  fileSize    Int
+  mimeType    String
+  s3Key       String
+  s3Url       String?
+  uploadedAt  DateTime  @default(now())
+  metadata    Json?
+  deleted     Boolean   @default(false)
+  deletedAt   DateTime?
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+
+  // Relationship to InsightObservation (one file can be linked to multiple observations)
+  insightObservations InsightObservation[]
+
+  @@index([interviewId])
+  @@index([questionId])
+  @@index([uploadedAt])
+}
+
+model OutboundEmail {
+  id               String       @id @default(uuid())
+  organizationId   String
+  campaignId       String
+  recipientId      String
+  userId           String
+  emailSuccess     Boolean
+  emailContent     String
+  emailSubjectLine String
+  sentAt           DateTime?
+  errorMessage     String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  campaign         Campaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  recipient        User         @relation("ReceivedEmails", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender           User         @relation("SentEmails", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([campaignId])
+  @@index([recipientId])
+  @@index([emailSuccess])
+  @@index([createdAt])
+}
+
+model Transaction {
+  id             String            @id @default(uuid())
+  userId         String
+  type           TransactionType
+  amount         Decimal           @db.Decimal(10, 2)
+  interviewId    String?
+  campaignId     String?
+  stripePayoutId String?
+  status         TransactionStatus @default(PENDING)
+  description    String?
+  metadata       Json?
+  processedAt    DateTime?
+  createdAt      DateTime          @default(now())
+  campaign       Campaign?         @relation(fields: [campaignId], references: [id])
+  interview      Interview?        @relation(fields: [interviewId], references: [id])
+  user           User              @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([interviewId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model EarningsCalculation {
+  id                     String    @id @default(uuid())
+  interviewId            String
+  userId                 String
+  questionId             String
+  questionText           String
+  userResponse           String?
+  earningAmount          Decimal?  @db.Decimal(8, 2)
+  earningCategory        String?
+  llmReasoningForEarning String?
+  createdAt              DateTime  @default(now())
+  interview              Interview @relation(fields: [interviewId], references: [id])
+  user                   User      @relation(fields: [userId], references: [id])
+
+  @@unique([interviewId, questionId])
+  @@index([interviewId])
+  @@index([userId])
+  @@index([questionId])
+  @@index([earningCategory])
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  FAILED
+}
+
+enum SourceType {
+  PLATFORM_DASHBOARD
+  PLATFORM_API
+  TERAC_AGENT_WEB
+  TERAC_AGENT_PHONE
+  TERAC_AGENT_EMAIL
+  INTERVIEW_CONTEXT
+  WEB_SOURCE
+  SYSTEM_EVENT
+  TRIGGER_JOB
+  UPLOAD
+  PROLIFIC_DEMOGRAPHIC
+  LINKEDIN_AUTH
+}
+
+enum TransactionType {
+  EARNING
+  WITHDRAWAL
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum CampaignType {
+  PEOPLE_SEARCH
+  INTERVIEW_PLATFORM
+}
+
+enum PeopleSearchStatus {
+  PENDING
+  SEARCHING
+  ENRICHING
+  JUDGING
+  COMPLETED
+  FAILED
+}
+
+enum CampaignStatus {
+  DRAFT
+  LIVE
+  COMPLETED
+  CLOSED
+}
+
+enum ProlificPaymentStatus {
+  UNPAID
+  PAID
+}
+
+enum MediaRequirement {
+  NONE
+  REQUESTED
+  REQUIRED
+}
+
+enum InterviewStatus {
+  INVITED
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  ACTIVE
+}
+
+enum NotificationType {
+  ORGANIZATION_INVITATION_CREATED
+  ORGANIZATION_INVITATION_ACCEPTED
+  ORGANIZATION_INVITATION_REVOKED
+  INTERVIEW_INVITATION_SENT
+  NEW_SURVEY_PUBLISHED
+  INTERVIEW_EARNINGS_POSTED
+  BUDGET_THRESHOLD_REACHED
+  SOURCING_APPROVAL_REQUESTED
+  SOURCING_APPROVAL_DECIDED
+  SOURCING_STARTED
+}
+
+enum PlanType {
+  FREE
+  PLUS
+  PRO
+  ENTERPRISE
+}

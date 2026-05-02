@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 Flawed Task Manager</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+        .warning { background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .task-form { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .task-list { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .task-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; background: #fafafa; }
+        .task-item.completed { background: #d4edda; text-decoration: line-through; opacity: 0.7; }
+        .priority { padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .priority.high { background: #ffebee; color: #c62828; }
+        .priority.medium { background: #fff3e0; color: #ef6c00; }
+        .priority.low { background: #e8f5e8; color: #2e7d32; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        button.danger { background: #dc3545; }
+        button.danger:hover { background: #c82333; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin: 5px; width: 200px; }
+        .error { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin: 10px 0; display: none; }
+        .loading { color: #007bff; font-style: italic; }
+        .bug-triggers { background: #fff; border: 2px solid #ff6b6b; border-radius: 10px; padding: 20px; margin: 20px 0; }
+        .bug-triggers h3 { color: #ff6b6b; margin-top: 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚨 Flawed Task Manager</h1>
+        <p>A deliberately buggy app for testing the Agent System</p>
+    </div>
+    
+    <div class="warning">
+        <strong>⚠️ Warning:</strong> This application contains intentional bugs and issues for testing purposes. 
+        The Agent System should be able to identify and help debug these problems!
+    </div>
+    
+    <div class="task-form">
+        <h3>Add New Task</h3>
+        <div>
+            <input type="text" id="taskTitle" placeholder="Task title" />
+            <select id="taskPriority">
+                <option value="">Select Priority</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        <div id="addError" class="error"></div>
+    </div>
+    
+    <div class="bug-triggers">
+        <h3>🐛 Bug Trigger Buttons</h3>
+        <p>These buttons will trigger specific bugs for the agent to discover:</p>
+        <button onclick="triggerRandomError()">Trigger Random API Error</button>
+        <button onclick="addEmptyTask()">Add Task Without Title</button>
+        <button onclick="toggleNonExistentTask()">Toggle Non-Existent Task</button>
+        <button onclick="deleteTaskThatDoesntDelete()">Fake Delete Task</button>
+        <button onclick="loadTasks()" class="danger">Force Reload (May Fail)</button>
+    </div>
+    
+    <div class="task-list">
+        <h3>Tasks</h3>
+        <div id="loading" class="loading">Loading tasks...</div>
+        <div id="error" class="error"></div>
+        <div id="taskContainer"></div>
+    </div>
+
+    <script>
+        let tasks = [];
+        
+        async function loadTasks() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/tasks');
+                tasks = await response.json();
+                displayTasks();
+            } catch (error) {
+                document.getElementById('error').textContent = 'Something went wrong!';
+                document.getElementById('error').style.display = 'block';
+                console.error('Error loading tasks:', error);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        function displayTasks() {
+            const container = document.getElementById('taskContainer');
+            container.innerHTML = '';
+            
+            if (tasks.length === 0) {
+                container.innerHTML = '<p>No tasks found. Add some tasks above!</p>';
+                return;
+            }
+            
+            tasks.forEach(task => {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = `task-item ${task.completed ? 'completed' : ''}`;
+                
+                // INTENTIONAL BUG: Doesn't handle undefined/null titles properly
+                taskDiv.innerHTML = `
+                    <div>
+                        <strong>${task.title}</strong>
+                        <span class="priority ${task.priority}">${task.priority}</span>
+                    </div>
+                    <div>
+                        <button onclick="toggleTask(${task.id})">${task.completed ? 'Undo' : 'Complete'}</button>
+                        <button class="danger" onclick="deleteTask(${task.id})">Delete</button>
+                    </div>
+                `;
+                container.appendChild(taskDiv);
+            });
+        }
+        
+        async function addTask() {
+            const title = document.getElementById('taskTitle').value;
+            const priority = document.getElementById('taskPriority').value;
+            
+            try {
+                const response = await fetch('/api/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, priority })
+                });
+                
+                const newTask = await response.json();
+                tasks.push(newTask);
+                displayTasks();
+                
+                document.getElementById('taskTitle').value = '';
+                document.getElementById('taskPriority').value = '';
+                
+            } catch (error) {
+                document.getElementById('addError').textContent = 'Failed to add task';
+                document.getElementById('addError').style.display = 'block';
+            }
+        }
+        
+        async function toggleTask(id) {
+            try {
+                const response = await fetch(`/api/tasks/${id}`, { method: 'PUT' });
+                const updatedTask = await response.json();
+                const index = tasks.findIndex(t => t.id === id);
+                if (index !== -1) {
+                    tasks[index] = updatedTask;
+                    displayTasks();
+                }
+            } catch (error) {
+                alert('Error updating task: ' + error.message);
+            }
+        }
+        
+        async function deleteTask(id) {
+            try {
+                await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+                tasks = tasks.filter(t => t.id !== id);
+                displayTasks();
+            } catch (error) {
+                alert('Error deleting task: ' + error.message);
+            }
+        }
+        
+        // Bug trigger functions
+        function triggerRandomError() { loadTasks(); }
+        function addEmptyTask() {
+            fetch('/api/tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: '', priority: 'low' })
+            }).then(() => loadTasks());
+        }
+        function toggleNonExistentTask() { toggleTask(99999); }
+        function deleteTaskThatDoesntDelete() {
+            if (tasks.length > 0) {
+                const firstTaskId = tasks[0].id;
+                deleteTask(firstTaskId);
+                setTimeout(() => {
+                    alert('Task was "deleted" from UI, but reload the page to see it\'s still there!');
+                }, 1000);
+            }
+        }
+        
+        loadTasks();
+    </script>
+</body>
+</html>

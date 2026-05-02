@@ -1,0 +1,1665 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# 🤖 Agent System Usage Rules
+
+## Overview
+This project contains a comprehensive agent testing system in the `circular/` directory and demo applications in `demo-apps/` for testing the agent. **CRITICAL**: Every feature implementation MUST be compartmentalized, tested with agent.sh, and documented in the knowledge system.
+
+## 🚀 Quick Start
+
+### 0. Set up API Key (Required)
+```bash
+cd circular
+cp env.sample .env
+# Edit .env and add your API key:
+# ANTHROPIC_API_KEY=your_key_here (recommended)
+# OR OPENAI_API_KEY=your_key_here
+# OR CEREBRAS_API_KEY=your_key_here
+```
+
+### 1. Start the Agent Server
+```bash
+cd circular
+./agent.sh --run
+```
+This will:
+- Start the agent server on port 3456
+- Open a browser window (visible, with DevTools)
+- Navigate to http://localhost:3000
+- Keep the browser open for testing
+
+### 2. Start a Demo App
+```bash
+cd demo-apps/[your-app-name]
+pnpm install
+pnpm db:push  # if using database
+pnpm db:seed  # if using database
+pnpm dev
+```
+
+### 3. Run Agent Tests
+```bash
+cd circular
+./agent.sh --test "Your test instruction here"
+```
+
+## 📋 Webapp Overview System
+
+**CRITICAL**: Every webapp MUST maintain a comprehensive overview document that serves as context for the agent. This document should be updated whenever features are added, modified, or fixed.
+
+### Webapp Overview Document Structure
+
+Each webapp should have a `WEBAPP_OVERVIEW.md` file in its root directory with the following structure:
+
+```markdown
+# [Webapp Name] - Comprehensive Overview
+
+## 🎯 Purpose & Core Functionality
+- **Primary Goal**: [What the webapp does]
+- **Target Users**: [Who uses it]
+- **Key Value Proposition**: [Why it exists]
+
+## 🏗️ Architecture Overview
+- **Frontend**: [Framework, key libraries, UI patterns]
+- **Backend**: [API structure, database, external services]
+- **Data Flow**: [How data moves through the system]
+- **Key Integrations**: [External APIs, services, etc.]
+
+## 🎮 Core Features & User Flows
+### Feature 1: [Feature Name]
+- **Purpose**: [What it does]
+- **User Flow**: [Step-by-step how users interact with it]
+- **Technical Implementation**: [How it's built]
+- **Dependencies**: [What other features it relies on]
+- **Edge Cases**: [Special scenarios to consider]
+
+### Feature 2: [Feature Name]
+- [Same structure as above]
+
+## 🎯 Domain-Specific Knowledge
+### [Domain] Rules & Logic
+- **Core Concepts**: [Key domain concepts the agent should understand]
+- **Business Rules**: [Important rules that govern the domain]
+- **Common Scenarios**: [Typical use cases and how they should work]
+- **Edge Cases**: [Special situations that need special handling]
+- **Validation Rules**: [What constitutes valid vs invalid states]
+
+## 🔧 Technical Implementation Details
+### Database Schema
+- **Key Tables**: [Main data structures]
+- **Relationships**: [How data connects]
+- **Constraints**: [Important database rules]
+
+### API Endpoints
+- **Key Routes**: [Main API endpoints and their purposes]
+- **Data Formats**: [Request/response structures]
+- **Error Handling**: [How errors are managed]
+
+### State Management
+- **Frontend State**: [How UI state is managed]
+- **Backend State**: [Server-side state considerations]
+- **Real-time Updates**: [How data syncs across clients]
+
+## 🧪 Testing Strategy
+### Critical User Flows
+- **Flow 1**: [Description and test steps]
+- **Flow 2**: [Description and test steps]
+
+### Edge Cases to Always Test
+- [List of edge cases that commonly break]
+- [Validation scenarios]
+- [Error conditions]
+
+### Integration Points
+- [External services that need testing]
+- [Database operations that need verification]
+- [Real-time features that need validation]
+
+## 🚨 Common Issues & Solutions
+### Known Problems
+- **Issue**: [Description]
+  - **Symptoms**: [How to identify it]
+  - **Root Cause**: [Why it happens]
+  - **Solution**: [How to fix it]
+  - **Prevention**: [How to avoid it]
+
+### Breaking Changes
+- [List of changes that commonly break other features]
+- [Dependencies that need to be updated together]
+
+## 📊 Success Metrics
+- **Functional**: [What should work correctly]
+- **Performance**: [Speed, responsiveness expectations]
+- **User Experience**: [How users should feel using it]
+```
+
+### Domain-Specific Context Examples
+
+#### Baseball Tracker Example
+```markdown
+## 🎯 Domain-Specific Knowledge
+### Baseball Rules & Logic
+- **Core Concepts**: 
+  - 9 innings, 3 outs per half-inning
+  - 4 bases (home, first, second, third)
+  - Ball/strike count (4 balls = walk, 3 strikes = out)
+  - Base runners advance on hits, walks, errors
+  - Runs scored when runner crosses home plate
+
+- **Business Rules**:
+  - Game state must be consistent (can't have negative outs, invalid scores)
+  - Player stats accumulate throughout the game
+  - Team stats reflect current game performance
+  - Inning changes after 3 outs
+
+- **Common Scenarios**:
+  - Single: Runner on first, batter to first base
+  - Double: Runner on first to third, batter to second base
+  - Home run: All runners score, batter scores
+  - Strikeout: Batter out, runners stay put
+  - Walk: Batter to first, runners advance if forced
+
+- **Edge Cases**:
+  - Double plays (multiple outs in one play)
+  - Sacrifice flies (out but runner scores)
+  - Errors (defensive mistakes)
+  - Inning changes (reset count, clear bases if needed)
+
+- **Validation Rules**:
+  - Outs cannot exceed 3
+  - Ball count cannot exceed 4
+  - Strike count cannot exceed 3
+  - Scores must be non-negative integers
+  - Base runners must have valid names
+```
+
+### Agent Context Enhancement
+
+**MANDATORY**: Before implementing any feature, the agent MUST:
+
+1. **Read the Webapp Overview**: Understand the full context of the application
+2. **Identify Dependencies**: Check what other features might be affected
+3. **Consider Domain Logic**: Apply domain-specific knowledge to the implementation
+4. **Plan Integration Testing**: Ensure the feature works with existing functionality
+5. **Update Overview**: Modify the overview document if the feature changes the app's behavior
+
+### Context-Aware Testing
+
+When testing features, the agent should:
+
+```bash
+# Always include webapp context in test commands
+./agent.sh --test -context "Testing [feature] in [webapp name]. 
+Webapp Purpose: [from overview]
+Domain Context: [relevant domain knowledge]
+Feature: [detailed description]
+How it fits: [how this feature integrates with others]
+Expected behavior: [what should happen]
+Edge cases: [domain-specific edge cases]
+Integration points: [what other features this affects]" "Test the [specific functionality] and verify it works correctly with the overall webapp"
+```
+
+## 🎯 MANDATORY Development Workflow
+
+**EVERY feature implementation MUST follow this exact workflow:**
+
+### 1. Receive Feature Specification
+- User provides feature requirements
+- **ALWAYS create a comprehensive todo list** using the todo_write tool
+- Break down the feature into testable sub-components
+- Each todo item should be specific and measurable
+
+### 2. Create Comprehensive Todo List
+```bash
+# Example todo structure for any feature:
+# 1. Implement [specific component] 
+# 2. Test [specific functionality] with agent.sh
+# 3. Test [edge cases] with agent.sh
+# 4. Test [integration] with agent.sh
+# 5. Document solution in knowledge system
+```
+
+### 3. Implement Sub-Feature (One at a time)
+- Work on ONE todo item at a time
+- Complete the implementation
+- **NEVER move to the next item without testing the current one**
+
+### 4. Test with Agent.sh (MANDATORY)
+**CRITICAL**: Every implementation MUST be tested with agent.sh before proceeding.
+
+```bash
+cd circular
+./agent.sh --test -context "Testing [specific feature] in [project context]. 
+Feature: [detailed description of what was implemented]
+How to use: [step-by-step instructions for the agent]
+Expected behavior: [what should happen]
+Edge cases to test: [specific edge cases]
+Project context: [relevant project information]" "Test the [specific functionality] that was just implemented. [Detailed test instructions]"
+```
+
+**Context MUST include:**
+- Specific feature description
+- How to use the feature
+- Expected behavior
+- Edge cases to test
+- Project context
+- Any relevant technical details
+
+### 5. Handle Errors/Issues
+If agent.sh reports errors or unexpected behavior:
+
+**Step 5a: Search Knowledge Base**
+```bash
+# Semantic search for similar issues
+./agent.sh --retrieve --input "[error description or similar issue]"
+
+# Tag-based search for specific components
+./agent.sh --retrieve --tags [relevant-tags] [component] [error-type]
+```
+
+**Step 5b: Analyze Retrieved Solutions**
+- Review solutions from knowledge base
+- Check if any apply to current issue
+- Note relevant tags and patterns
+
+### 6. Implement Solution
+- Try retrieved solutions if applicable
+- Otherwise, implement your own solution
+- Document the approach taken
+
+### 7. Test Solution
+```bash
+./agent.sh --test -context "Testing fix for [issue]. 
+Problem: [original error]
+Solution: [what was implemented]
+Expected result: [what should happen now]" "Verify the fix works correctly and test [specific functionality]"
+```
+
+### 8. Iterate if Needed
+If solution doesn't work:
+- Repeat steps 5-7
+- Try different approaches
+- Gather more information from knowledge base
+
+### 9. Document Success in Knowledge System
+**MANDATORY**: Store successful solutions in knowledge system.
+
+```bash
+./agent.sh --store --issue "[Full error message and context]" --solution "[Complete solution with steps]" --tags [error-type] [component] [technology] [severity] [project-context]
+```
+
+**Example:**
+```bash
+./agent.sh --store --issue "React component not rendering after API call returns 500 error. Component: TaskForm, API: /api/tasks/create, Error: 'Cannot read property of undefined'" --solution "Fixed by adding proper error handling with try-catch block and null checks for API response. Added loading states and error boundaries." --tags react api-error error-handling frontend task-form
+```
+
+### 10. Continue Development
+- Mark current todo as completed
+- Move to next todo item
+- Repeat steps 3-9 for each component
+
+## 📋 Agent Commands
+
+### Basic Syntax
+```bash
+# Simple test
+./agent.sh --test "Click the button"
+
+# Test with context (RECOMMENDED)
+./agent.sh --test -context "Detailed context about feature and project" "Specific test instructions"
+```
+
+## 📋 Agent Commands
+
+### Basic Syntax
+```bash
+# Simple test
+./agent.sh --test "Click the button"
+
+# Test with context
+./agent.sh --test -context "User is testing forms" "Fill out the form and submit"
+```
+
+### Knowledge System Commands
+
+#### Store Knowledge (--store)
+Store issues and solutions for future reference:
+
+```bash
+# Basic usage
+./agent.sh --store --issue "Description of the problem" --solution "How it was solved"
+
+# With tags for better categorization
+./agent.sh --store --issue "API returns 500 error" --solve "Fixed DB connection pool" --tags bug api database
+
+# With metadata for additional context
+./agent.sh --store --issue "Performance issue" --tags performance --metadata '{"severity":"high","component":"frontend"}'
+```
+
+**Tag Guidelines:**
+- **Technology**: `react`, `nodejs`, `typescript`, `prisma`, `nextjs`
+- **Component**: `frontend`, `backend`, `api`, `database`, `auth`
+- **Error Type**: `bug`, `performance`, `security`, `ui`, `api-error`
+- **Severity**: `critical`, `high`, `medium`, `low`
+- **Feature**: `task-management`, `user-auth`, `file-upload`
+
+#### Retrieve Knowledge (--retrieve)
+Search stored knowledge using semantic search or tags:
+
+```bash
+# Semantic search (searches issue and solution text)
+./agent.sh --retrieve --input "database connection errors"
+./agent.sh --retrieve --input "React component not rendering"
+./agent.sh --retrieve --input "API authentication issues"
+
+# Tag-based search
+./agent.sh --retrieve --tags bug database
+./agent.sh --retrieve --tags react frontend
+./agent.sh --retrieve --tags api-error authentication
+
+# Combined search with limit
+./agent.sh --retrieve --input "performance issues" --tags frontend --limit 10
+./agent.sh --retrieve --input "authentication" --tags security --limit 3
+```
+
+**Search Strategies:**
+- **For Error Debugging**: Use semantic search with error description
+- **For Component Issues**: Use tag-based search with component + error type
+- **For Technology Issues**: Use tag-based search with technology + issue type
+
+### Common Test Patterns
+
+#### UI Interactions (Always with Context)
+```bash
+./agent.sh --test -context "Testing UI interaction for [feature]. 
+Feature: [description]
+How to use: [instructions]
+Expected: [behavior]" "Click the 'Add Item' button and verify the form opens"
+
+./agent.sh --test -context "Testing form interaction. 
+Feature: [description]
+Required fields: [list]
+Expected validation: [behavior]" "Fill the form with required fields and submit"
+```
+
+#### Form Testing (With Edge Cases)
+```bash
+./agent.sh --test -context "Testing form validation for [feature].
+Feature: [description]
+Required fields: [list]
+Validation rules: [rules]
+Edge cases: [cases]" "Try to submit the form with empty required fields and verify error message appears"
+
+./agent.sh --test -context "Testing form submission for [feature].
+Feature: [description]
+Expected behavior: [behavior]
+Success criteria: [criteria]" "Create a new item with all required fields and verify it appears in the list"
+```
+
+#### API Testing (With Context)
+```bash
+./agent.sh --test -context "Testing API integration for [feature].
+Feature: [description]
+API endpoint: [endpoint]
+Expected response: [response]
+Error handling: [handling]" "Test the API call by [specific action] and verify [expected result]"
+```
+
+#### File Operations (With Context)
+```bash
+./agent.sh --test -context "Testing file operations for [feature].
+Feature: [description]
+File types: [types]
+Size limits: [limits]
+Expected behavior: [behavior]" "Export data as JSON file and verify download starts"
+
+./agent.sh --test -context "Testing file upload for [feature].
+Feature: [description]
+Upload requirements: [requirements]
+Validation: [validation]" "Upload a file attachment and verify it appears in the interface"
+```
+
+## 🔍 Proactive Issue Detection
+
+**CRITICAL**: The agent must be proactive in detecting issues, not just reactive to user requests.
+
+### Issue Detection Checklist
+
+After implementing ANY feature, the agent MUST check:
+
+#### 1. Functional Integrity
+- [ ] **Primary Feature Works**: The requested feature functions as expected
+- [ ] **Related Features Still Work**: Existing features haven't been broken
+- [ ] **Data Consistency**: Database state is valid and consistent
+- [ ] **UI Responsiveness**: Interface updates correctly and remains responsive
+- [ ] **Error Handling**: Proper error states and messages are displayed
+
+#### 2. Domain Logic Validation
+- [ ] **Business Rules**: All domain-specific rules are followed
+- [ ] **Edge Cases**: Unusual scenarios are handled correctly
+- [ ] **Validation**: Input validation works as expected
+- [ ] **State Transitions**: Game/application state changes are logical
+- [ ] **Data Relationships**: Related data remains consistent
+
+#### 3. Integration Points
+- [ ] **Database Operations**: CRUD operations work correctly
+- [ ] **API Endpoints**: All endpoints respond appropriately
+- [ ] **Real-time Updates**: Live data synchronization works
+- [ ] **External Services**: Third-party integrations function
+- [ ] **Cross-Component Communication**: Components interact properly
+
+#### 4. User Experience
+- [ ] **Navigation**: Users can move through the app logically
+- [ ] **Feedback**: Users receive appropriate feedback for actions
+- [ ] **Performance**: App remains fast and responsive
+- [ ] **Accessibility**: Interface remains usable
+- [ ] **Mobile/Responsive**: Works across different screen sizes
+
+### Proactive Testing Commands
+
+```bash
+# Test the specific feature
+./agent.sh --test -context "[feature context]" "Test [specific functionality]"
+
+# Test related features that might be affected
+./agent.sh --test -context "[integration context]" "Test [related functionality] to ensure it still works"
+
+# Test edge cases
+./agent.sh --test -context "[edge case context]" "Test [edge case scenario] to verify proper handling"
+
+# Test data integrity
+./agent.sh --test -context "[data context]" "Verify that [data operations] work correctly and maintain consistency"
+
+# Test user flows end-to-end
+./agent.sh --test -context "[flow context]" "Complete the full [user flow] to ensure everything works together"
+```
+
+## 🎯 Testing Best Practices
+
+### 1. Always Use Context (MANDATORY)
+**NEVER run agent tests without comprehensive context. The agent needs to understand:**
+- What feature is being tested
+- How the feature works
+- What the expected behavior is
+- What edge cases to test
+- Project context and constraints
+
+**Good Context Example:**
+```bash
+./agent.sh --test -context "Testing task creation feature in task manager app.
+Feature: New task creation form with title, description, priority, and due date
+How to use: Click 'Add Task' button, fill form fields, click 'Create Task'
+Expected behavior: Task appears in 'To Do' column with correct data
+Edge cases: Empty title validation, invalid dates, special characters
+Project context: Next.js app with tRPC, Prisma database, real-time updates
+Technical details: Form uses React Hook Form, validation with Zod schema" "Create a new task with title 'Test Task', priority 'HIGH', and verify it appears correctly"
+```
+
+### 2. Be Specific and Measurable
+- ❌ "Test the form"
+- ✅ "Fill out the task creation form with title 'Test Task', priority 'HIGH', due date tomorrow, and verify it appears in the 'To Do' column with correct data"
+
+### 3. Test Incrementally (One Feature at a Time)
+```bash
+# Test basic functionality first
+./agent.sh --test -context "[context]" "Create a task with just title and verify it works"
+
+# Then test with more fields
+./agent.sh --test -context "[context]" "Create a task with title, priority, and due date"
+
+# Then test edge cases
+./agent.sh --test -context "[context]" "Try to create task with empty title and verify error message"
+```
+
+### 4. Test User Flows End-to-End
+```bash
+./agent.sh --test -context "[context]" "Complete full task lifecycle: create task 'Test Task', edit description to 'Updated description', change priority to 'URGENT', drag to 'In Progress' column, add comment 'Working on it', then mark as 'Done'"
+```
+
+### 5. Verify Results with Specific Criteria
+```bash
+./agent.sh --test -context "[context]" "Create a task and verify it appears in the correct column with correct title, priority badge, and due date formatting"
+./agent.sh --test -context "[context]" "Delete a task and confirm it's completely removed from all views and database"
+```
+
+## 🔄 Complete Development Workflow Examples
+
+### Example 1: Adding a New Feature - "Task Comments"
+
+**Step 1: Create Todo List**
+```bash
+# Use todo_write tool to create:
+# 1. Implement comment input component
+# 2. Add comment API endpoint
+# 3. Test comment creation with agent.sh
+# 4. Test comment display with agent.sh
+# 5. Test comment validation with agent.sh
+# 6. Test comment deletion with agent.sh
+# 7. Document any issues/solutions in knowledge system
+```
+
+**Step 2: Implement Comment Input Component**
+```typescript
+// Implement the component code
+```
+
+**Step 3: Test Comment Input with Agent**
+```bash
+cd circular
+./agent.sh --test -context "Testing new comment input feature in task manager.
+Feature: Comment input field added to task cards
+How to use: Click on a task card, type comment in input field, press Enter or click Add
+Expected behavior: Comment appears in task card comment section
+Edge cases: Empty comments, very long comments, special characters
+Project context: React component with tRPC API, real-time updates
+Technical details: Uses React Hook Form, validates comment length (max 500 chars)" "Click on the first task card, add a comment 'This is a test comment', and verify it appears in the comment section"
+```
+
+**Step 4: Handle Any Issues**
+If agent reports errors:
+```bash
+# Search knowledge base for similar issues
+./agent.sh --retrieve --input "React component not updating after form submission"
+./agent.sh --retrieve --tags react form-submission frontend
+
+# If found solution, implement it, otherwise create new solution
+# Test the fix
+./agent.sh --test -context "Testing fix for comment submission issue..." "Verify comment submission now works correctly"
+
+# Store successful solution
+./agent.sh --store --issue "Comment input not submitting properly - form state not updating" --solution "Fixed by ensuring proper form reset and state management in React Hook Form. Added useEffect to reset form after successful submission." --tags react form-submission frontend comment-feature
+```
+
+**Step 5: Continue with Next Todo Item**
+- Mark current todo as completed
+- Move to next item (API endpoint)
+- Repeat testing process
+
+### Example 2: Debugging an Existing Issue
+
+**Step 1: Agent Reports Error**
+```bash
+# Agent test fails with error: "Cannot read property 'title' of undefined"
+```
+
+**Step 2: Search Knowledge Base**
+```bash
+./agent.sh --retrieve --input "Cannot read property of undefined React"
+./agent.sh --retrieve --tags react undefined-error frontend
+```
+
+**Step 3: Analyze and Implement Solution**
+```bash
+# If knowledge base has solution, implement it
+# Otherwise, debug and create solution
+# Test the fix
+./agent.sh --test -context "Testing fix for undefined property error..." "Verify the task list now loads without errors"
+```
+
+**Step 4: Document Solution**
+```bash
+./agent.sh --store --issue "Task list component throwing 'Cannot read property title of undefined' error when tasks array is empty or loading" --solution "Added null checks and loading states. Wrapped task mapping in conditional render with tasks && tasks.length > 0. Added loading spinner component." --tags react undefined-error frontend task-list loading-state
+```
+
+## 🔧 Troubleshooting
+
+### Agent Server Issues
+```bash
+# Check if server is running
+curl http://localhost:3456/health
+
+# Restart agent server
+./agent.sh --run
+
+# Check server logs
+curl http://localhost:3456/logs
+```
+
+### Demo App Issues
+```bash
+# Reset database (if using database)
+cd demo-apps/[your-app-name]
+pnpm db:push
+pnpm db:seed
+
+# Check if app is running
+curl http://localhost:3000
+```
+
+### Common Errors
+- **"Agent server is not ready"**: Start the agent server first
+- **"Cannot connect to localhost:3000"**: Start the demo app first
+- **"Permission denied"**: Run `chmod +x agent.sh`
+- **"No API key found"**: Set up your API key in `.env` file
+- **"Computer Use Agent requires..."**: Use Anthropic or OpenAI API key (Cerebras doesn't support computer use)
+
+### Knowledge System Issues
+```bash
+# If store/retrieve commands fail, check database connection
+cd circular
+pnpm db:push
+
+# Check if embeddings service is running
+curl http://localhost:8000/health  # or your embeddings service URL
+
+# Reset knowledge base if needed
+pnpm db:reset
+```
+
+## 🚨 CRITICAL Rules for Development
+
+### 1. ALWAYS Create Todo Lists
+**MANDATORY**: Every feature request MUST start with creating a comprehensive todo list using `todo_write` tool.
+
+### 2. ALWAYS Test with Agent.sh
+**NEVER** consider a feature complete without testing it with agent.sh using comprehensive context.
+
+### 3. ALWAYS Use Context in Tests
+**NEVER** run agent tests without detailed context explaining the feature, how to use it, and what to expect.
+
+### 4. ALWAYS Document Solutions
+**MANDATORY**: Every successful solution to an issue MUST be stored in the knowledge system with appropriate tags.
+
+### 5. ALWAYS Search Knowledge Base First
+**BEFORE** implementing a solution, search the knowledge base for similar issues and solutions.
+
+### 6. ALWAYS Work Incrementally
+**ONE** todo item at a time. Complete implementation → Test → Fix → Document → Move to next item.
+
+### 7. ALWAYS Verify Results
+**NEVER** assume something works. Always verify with specific, measurable criteria.
+
+### 8. ALWAYS Check for Side Effects
+**MANDATORY**: After implementing any feature, the agent MUST:
+- Test the specific feature that was requested
+- **Proactively test related features** that might be affected
+- **Check for regressions** in existing functionality
+- **Verify data integrity** across the entire application
+- **Test edge cases** that might have been introduced
+
+### 9. ALWAYS Apply Domain Knowledge
+**CRITICAL**: The agent MUST understand and apply domain-specific logic:
+- **Read the webapp overview** before making changes
+- **Understand business rules** and validation requirements
+- **Consider real-world scenarios** and edge cases
+- **Apply domain expertise** to catch logical inconsistencies
+- **Think beyond the immediate request** to consider broader implications
+
+### 10. ALWAYS Test Integration Points
+**MANDATORY**: When making changes, test:
+- **Database operations** (create, read, update, delete)
+- **API endpoints** (request/response handling)
+- **UI components** (rendering, interactions, state)
+- **Real-time features** (updates, synchronization)
+- **External integrations** (third-party services, APIs)
+- **Cross-feature dependencies** (how features interact)
+
+## 📊 Knowledge System Best Practices
+
+### Tagging Strategy
+Use consistent tags for better searchability:
+
+**Technology Tags:**
+- `react`, `nextjs`, `typescript`, `nodejs`, `prisma`, `tRPC`
+
+**Component Tags:**
+- `frontend`, `backend`, `api`, `database`, `auth`, `ui`
+
+**Error Type Tags:**
+- `bug`, `performance`, `security`, `ui-error`, `api-error`, `validation`
+
+**Severity Tags:**
+- `critical`, `high`, `medium`, `low`
+
+**Feature Tags:**
+- `task-management`, `user-auth`, `file-upload`, `real-time`, `forms`
+
+### Search Strategies
+1. **Semantic Search**: Use natural language descriptions of the problem
+2. **Tag Search**: Combine technology + component + error type
+3. **Combined Search**: Use both semantic and tag search together
+
+### Storage Best Practices
+1. **Include Full Context**: Error messages, component names, API endpoints
+2. **Describe Complete Solution**: Step-by-step fix with code examples
+3. **Use Multiple Tags**: Technology, component, error type, severity
+4. **Include Metadata**: When relevant, add JSON metadata for additional context
+
+## 📊 Available Demo Apps
+
+### Task Manager (`demo-apps/task-manager/`)
+- **Features**: CRUD operations, drag-and-drop, file uploads, real-time updates, calendar view, knowledge base
+- **APIs**: tRPC + traditional REST APIs + WebSockets + Knowledge API
+- **Test Scenarios**: 50+ comprehensive test cases in `AGENT_TEST_SCENARIOS.md`
+- **Knowledge Integration**: Ollama store() and retrieve() functions for learning from agent activities
+
+### Example Test Commands (Always with Context)
+```bash
+# Basic CRUD with comprehensive context
+./agent.sh --test -context "Testing task creation in task manager app. Feature: Task creation form with title, description, priority, due date. How to use: Click 'Add Task' button, fill form, submit. Expected: Task appears in 'To Do' column. Edge cases: Empty title validation, invalid dates. Project: Next.js with tRPC and Prisma." "Create a new task with title 'Test Task', priority 'HIGH', and verify it appears correctly"
+
+# Drag and Drop with context
+./agent.sh --test -context "Testing drag and drop functionality. Feature: Drag tasks between columns (To Do, In Progress, Done). How to use: Click and drag task card to different column. Expected: Task moves to new column and status updates. Project: React with drag-and-drop library." "Drag the 'Test Task' from 'To Do' to 'In Progress' column and verify status updates"
+
+# File Operations with context
+./agent.sh --test -context "Testing file export functionality. Feature: Export all tasks as JSON file. How to use: Click export button in header. Expected: Browser downloads JSON file with all task data. Project: Next.js API route for file generation." "Click the export button and verify JSON file downloads with all task data"
+
+# Knowledge Base testing
+./agent.sh --test -context "Testing knowledge base integration. Feature: Store and retrieve knowledge about issues and solutions. How to use: Click brain icon, search for knowledge, store new entries. Expected: Search returns relevant results, new entries are stored. Project: Ollama integration with embeddings." "Click the knowledge base icon, search for 'task creation issues', and verify relevant results appear"
+```
+
+## 🎯 Development Workflow Summary
+
+**Every development session MUST follow this pattern:**
+
+1. **Receive Feature Request** → Create comprehensive todo list
+2. **Implement Sub-Feature** → Test with agent.sh (with context)
+3. **Handle Issues** → Search knowledge base → Implement solution → Test → Store solution
+4. **Continue** → Mark todo complete → Move to next item → Repeat
+5. **Complete Feature** → Final integration testing → Document in knowledge system
+
+**Key Principles:**
+- **Compartmentalize**: One feature at a time, one test at a time
+- **Context is King**: Always provide comprehensive context to agent
+- **Knowledge is Power**: Search before implementing, store after solving
+- **Verify Everything**: Never assume, always test and verify
+- **Document Success**: Every solution becomes future knowledge
+
+## 📋 Webapp Overview Maintenance
+
+### Creating New Webapp Overviews
+
+When creating a new webapp, the agent MUST:
+
+1. **Create WEBAPP_OVERVIEW.md** in the webapp root directory
+2. **Follow the template structure** provided above
+3. **Include domain-specific knowledge** relevant to the webapp's purpose
+4. **Document all core features** and their interactions
+5. **List common issues** and their solutions
+6. **Define testing strategies** specific to the domain
+
+### Updating Existing Overviews
+
+**MANDATORY**: Every time a feature is added, modified, or fixed:
+
+1. **Update the relevant sections** in WEBAPP_OVERVIEW.md
+2. **Add new edge cases** that were discovered
+3. **Document new issues** and their solutions
+4. **Update testing strategies** everytime something is successfully changed, check everything else in the webapp to make sure it didn't break anything else. This is VERY IMPORTANT.
+5. **Revise domain knowledge** if business rules change
+
+### Using Overviews for Context
+
+**CRITICAL**: Before implementing any feature:
+
+```bash
+# Read the webapp overview first
+cat [webapp-directory]/WEBAPP_OVERVIEW.md
+
+# Use overview context in all test commands
+./agent.sh --test -context "Testing [feature] in [webapp]. 
+Webapp Overview: [relevant sections from overview]
+Domain Knowledge: [applicable domain rules]
+Feature Context: [how this fits with existing features]
+Integration Points: [what other features this affects]" "Test [specific functionality]"
+```
+
+### Overview Quality Checklist
+
+Each WEBAPP_OVERVIEW.md should have:
+
+- [ ] **Clear purpose statement** - What the webapp does and why
+- [ ] **Complete feature list** - All major functionality documented
+- [ ] **Domain-specific knowledge** - Business rules and logic
+- [ ] **Technical architecture** - How it's built and structured
+- [ ] **Testing strategy** - How to verify it works correctly
+- [ ] **Common issues** - Known problems and solutions
+- [ ] **Recent updates** - What's changed and why
+
+## 📚 Additional Resources
+
+- `circular/AGENT_USAGE.md` - Detailed agent documentation
+- `demo-apps/task-manager/AGENT_TEST_SCENARIOS.md` - Comprehensive test scenarios
+- `demo-apps/task-manager/README.md` - Task manager app documentation
+- `demo-apps/baseball-tracker/WEBAPP_OVERVIEW.md` - Example webapp overview
+- `circular/KNOWLEDGE_SYSTEM.md` - Knowledge system documentation
+
+---
+
+**Remember: The agent is only as good as the context you provide. Be specific, be comprehensive, be systematic, and always maintain comprehensive webapp overviews. Happy Testing! 🎉**
+
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# 🤖 Agent System Usage Rules
+
+## Overview
+This project contains a comprehensive agent testing system in the `circular/` directory and demo applications in `demo-apps/` for testing the agent. **CRITICAL**: Every feature implementation MUST be compartmentalized, tested with agent.sh, and documented in the knowledge system.
+
+## 🚀 Quick Start
+
+### 0. Set up API Key (Required)
+```bash
+cd circular
+cp env.sample .env
+# Edit .env and add your API key:
+# ANTHROPIC_API_KEY=your_key_here (recommended)
+# OR OPENAI_API_KEY=your_key_here
+# OR CEREBRAS_API_KEY=your_key_here
+```
+
+### 1. Start the Agent Server
+```bash
+cd circular
+./agent.sh --run
+```
+This will:
+- Start the agent server on port 3456
+- Open a browser window (visible, with DevTools)
+- Navigate to http://localhost:3000
+- Keep the browser open for testing
+
+### 2. Start a Demo App
+```bash
+cd demo-apps/[your-app-name]
+pnpm install
+pnpm db:push  # if using database
+pnpm db:seed  # if using database
+pnpm dev
+```
+
+### 3. Run Agent Tests
+```bash
+cd circular
+./agent.sh --test "Your test instruction here"
+```
+
+## 📋 Webapp Overview System
+
+**CRITICAL**: Every webapp MUST maintain a comprehensive overview document that serves as context for the agent. This document should be updated whenever features are added, modified, or fixed.
+
+### Webapp Overview Document Structure
+
+Each webapp should have a `WEBAPP_OVERVIEW.md` file in its root directory with the following structure:
+
+```markdown
+# [Webapp Name] - Comprehensive Overview
+
+## 🎯 Purpose & Core Functionality
+- **Primary Goal**: [What the webapp does]
+- **Target Users**: [Who uses it]
+- **Key Value Proposition**: [Why it exists]
+
+## 🏗️ Architecture Overview
+- **Frontend**: [Framework, key libraries, UI patterns]
+- **Backend**: [API structure, database, external services]
+- **Data Flow**: [How data moves through the system]
+- **Key Integrations**: [External APIs, services, etc.]
+
+## 🎮 Core Features & User Flows
+### Feature 1: [Feature Name]
+- **Purpose**: [What it does]
+- **User Flow**: [Step-by-step how users interact with it]
+- **Technical Implementation**: [How it's built]
+- **Dependencies**: [What other features it relies on]
+- **Edge Cases**: [Special scenarios to consider]
+
+### Feature 2: [Feature Name]
+- [Same structure as above]
+
+## 🎯 Domain-Specific Knowledge
+### [Domain] Rules & Logic
+- **Core Concepts**: [Key domain concepts the agent should understand]
+- **Business Rules**: [Important rules that govern the domain]
+- **Common Scenarios**: [Typical use cases and how they should work]
+- **Edge Cases**: [Special situations that need special handling]
+- **Validation Rules**: [What constitutes valid vs invalid states]
+
+## 🔧 Technical Implementation Details
+### Database Schema
+- **Key Tables**: [Main data structures]
+- **Relationships**: [How data connects]
+- **Constraints**: [Important database rules]
+
+### API Endpoints
+- **Key Routes**: [Main API endpoints and their purposes]
+- **Data Formats**: [Request/response structures]
+- **Error Handling**: [How errors are managed]
+
+### State Management
+- **Frontend State**: [How UI state is managed]
+- **Backend State**: [Server-side state considerations]
+- **Real-time Updates**: [How data syncs across clients]
+
+## 🧪 Testing Strategy
+### Critical User Flows
+- **Flow 1**: [Description and test steps]
+- **Flow 2**: [Description and test steps]
+
+### Edge Cases to Always Test
+- [List of edge cases that commonly break]
+- [Validation scenarios]
+- [Error conditions]
+
+### Integration Points
+- [External services that need testing]
+- [Database operations that need verification]
+- [Real-time features that need validation]
+
+## 🚨 Common Issues & Solutions
+### Known Problems
+- **Issue**: [Description]
+  - **Symptoms**: [How to identify it]
+  - **Root Cause**: [Why it happens]
+  - **Solution**: [How to fix it]
+  - **Prevention**: [How to avoid it]
+
+### Breaking Changes
+- [List of changes that commonly break other features]
+- [Dependencies that need to be updated together]
+
+## 📊 Success Metrics
+- **Functional**: [What should work correctly]
+- **Performance**: [Speed, responsiveness expectations]
+- **User Experience**: [How users should feel using it]
+```
+
+### Domain-Specific Context Examples
+
+#### Baseball Tracker Example
+```markdown
+## 🎯 Domain-Specific Knowledge
+### Baseball Rules & Logic
+- **Core Concepts**: 
+  - 9 innings, 3 outs per half-inning
+  - 4 bases (home, first, second, third)
+  - Ball/strike count (4 balls = walk, 3 strikes = out)
+  - Base runners advance on hits, walks, errors
+  - Runs scored when runner crosses home plate
+
+- **Business Rules**:
+  - Game state must be consistent (can't have negative outs, invalid scores)
+  - Player stats accumulate throughout the game
+  - Team stats reflect current game performance
+  - Inning changes after 3 outs
+
+- **Common Scenarios**:
+  - Single: Runner on first, batter to first base
+  - Double: Runner on first to third, batter to second base
+  - Home run: All runners score, batter scores
+  - Strikeout: Batter out, runners stay put
+  - Walk: Batter to first, runners advance if forced
+
+- **Edge Cases**:
+  - Double plays (multiple outs in one play)
+  - Sacrifice flies (out but runner scores)
+  - Errors (defensive mistakes)
+  - Inning changes (reset count, clear bases if needed)
+
+- **Validation Rules**:
+  - Outs cannot exceed 3
+  - Ball count cannot exceed 4
+  - Strike count cannot exceed 3
+  - Scores must be non-negative integers
+  - Base runners must have valid names
+```
+
+### Agent Context Enhancement
+
+**MANDATORY**: Before implementing any feature, the agent MUST:
+
+1. **Read the Webapp Overview**: Understand the full context of the application
+2. **Identify Dependencies**: Check what other features might be affected
+3. **Consider Domain Logic**: Apply domain-specific knowledge to the implementation
+4. **Plan Integration Testing**: Ensure the feature works with existing functionality
+5. **Update Overview**: Modify the overview document if the feature changes the app's behavior
+
+### Context-Aware Testing
+
+When testing features, the agent should:
+
+```bash
+# Always include webapp context in test commands
+./agent.sh --test -context "Testing [feature] in [webapp name]. 
+Webapp Purpose: [from overview]
+Domain Context: [relevant domain knowledge]
+Feature: [detailed description]
+How it fits: [how this feature integrates with others]
+Expected behavior: [what should happen]
+Edge cases: [domain-specific edge cases]
+Integration points: [what other features this affects]" "Test the [specific functionality] and verify it works correctly with the overall webapp"
+```
+
+## 🎯 MANDATORY Development Workflow
+
+**EVERY feature implementation MUST follow this exact workflow:**
+
+### 1. Receive Feature Specification
+- User provides feature requirements
+- **ALWAYS create a comprehensive todo list** using the todo_write tool
+- Break down the feature into testable sub-components
+- Each todo item should be specific and measurable
+
+### 2. Create Comprehensive Todo List
+```bash
+# Example todo structure for any feature:
+# 1. Implement [specific component] 
+# 2. Test [specific functionality] with agent.sh
+# 3. Test [edge cases] with agent.sh
+# 4. Test [integration] with agent.sh
+# 5. Document solution in knowledge system
+```
+
+### 3. Implement Sub-Feature (One at a time)
+- Work on ONE todo item at a time
+- Complete the implementation
+- **NEVER move to the next item without testing the current one**
+
+### 4. Test with Agent.sh (MANDATORY)
+**CRITICAL**: Every implementation MUST be tested with agent.sh before proceeding.
+
+```bash
+cd circular
+./agent.sh --test -context "Testing [specific feature] in [project context]. 
+Feature: [detailed description of what was implemented]
+How to use: [step-by-step instructions for the agent]
+Expected behavior: [what should happen]
+Edge cases to test: [specific edge cases]
+Project context: [relevant project information]" "Test the [specific functionality] that was just implemented. [Detailed test instructions]"
+```
+
+**Context MUST include:**
+- Specific feature description
+- How to use the feature
+- Expected behavior
+- Edge cases to test
+- Project context
+- Any relevant technical details
+
+### 5. Handle Errors/Issues
+If agent.sh reports errors or unexpected behavior:
+
+**Step 5a: Search Knowledge Base**
+```bash
+# Semantic search for similar issues
+./agent.sh --retrieve --input "[error description or similar issue]"
+
+# Tag-based search for specific components
+./agent.sh --retrieve --tags [relevant-tags] [component] [error-type]
+```
+
+**Step 5b: Analyze Retrieved Solutions**
+- Review solutions from knowledge base
+- Check if any apply to current issue
+- Note relevant tags and patterns
+
+### 6. Implement Solution
+- Try retrieved solutions if applicable
+- Otherwise, implement your own solution
+- Document the approach taken
+
+### 7. Test Solution
+```bash
+./agent.sh --test -context "Testing fix for [issue]. 
+Problem: [original error]
+Solution: [what was implemented]
+Expected result: [what should happen now]" "Verify the fix works correctly and test [specific functionality]"
+```
+
+### 8. Iterate if Needed
+If solution doesn't work:
+- Repeat steps 5-7
+- Try different approaches
+- Gather more information from knowledge base
+
+### 9. Document Success in Knowledge System
+**MANDATORY**: Store successful solutions in knowledge system.
+
+```bash
+./agent.sh --store --issue "[Full error message and context]" --solution "[Complete solution with steps]" --tags [error-type] [component] [technology] [severity] [project-context]
+```
+
+**Example:**
+```bash
+./agent.sh --store --issue "React component not rendering after API call returns 500 error. Component: TaskForm, API: /api/tasks/create, Error: 'Cannot read property of undefined'" --solution "Fixed by adding proper error handling with try-catch block and null checks for API response. Added loading states and error boundaries." --tags react api-error error-handling frontend task-form
+```
+
+### 10. Continue Development
+- Mark current todo as completed
+- Move to next todo item
+- Repeat steps 3-9 for each component
+
+## 📋 Agent Commands
+
+### Basic Syntax
+```bash
+# Simple test
+./agent.sh --test "Click the button"
+
+# Test with context (RECOMMENDED)
+./agent.sh --test -context "Detailed context about feature and project" "Specific test instructions"
+```
+
+## 📋 Agent Commands
+
+### Basic Syntax
+```bash
+# Simple test
+./agent.sh --test "Click the button"
+
+# Test with context
+./agent.sh --test -context "User is testing forms" "Fill out the form and submit"
+```
+
+### Knowledge System Commands
+
+#### Store Knowledge (--store)
+Store issues and solutions for future reference:
+
+```bash
+# Basic usage
+./agent.sh --store --issue "Description of the problem" --solution "How it was solved"
+
+# With tags for better categorization
+./agent.sh --store --issue "API returns 500 error" --solve "Fixed DB connection pool" --tags bug api database
+
+# With metadata for additional context
+./agent.sh --store --issue "Performance issue" --tags performance --metadata '{"severity":"high","component":"frontend"}'
+```
+
+**Tag Guidelines:**
+- **Technology**: `react`, `nodejs`, `typescript`, `prisma`, `nextjs`
+- **Component**: `frontend`, `backend`, `api`, `database`, `auth`
+- **Error Type**: `bug`, `performance`, `security`, `ui`, `api-error`
+- **Severity**: `critical`, `high`, `medium`, `low`
+- **Feature**: `task-management`, `user-auth`, `file-upload`
+
+#### Retrieve Knowledge (--retrieve)
+Search stored knowledge using semantic search or tags:
+
+```bash
+# Semantic search (searches issue and solution text)
+./agent.sh --retrieve --input "database connection errors"
+./agent.sh --retrieve --input "React component not rendering"
+./agent.sh --retrieve --input "API authentication issues"
+
+# Tag-based search
+./agent.sh --retrieve --tags bug database
+./agent.sh --retrieve --tags react frontend
+./agent.sh --retrieve --tags api-error authentication
+
+# Combined search with limit
+./agent.sh --retrieve --input "performance issues" --tags frontend --limit 10
+./agent.sh --retrieve --input "authentication" --tags security --limit 3
+```
+
+**Search Strategies:**
+- **For Error Debugging**: Use semantic search with error description
+- **For Component Issues**: Use tag-based search with component + error type
+- **For Technology Issues**: Use tag-based search with technology + issue type
+
+### Common Test Patterns
+
+#### UI Interactions (Always with Context)
+```bash
+./agent.sh --test -context "Testing UI interaction for [feature]. 
+Feature: [description]
+How to use: [instructions]
+Expected: [behavior]" "Click the 'Add Item' button and verify the form opens"
+
+./agent.sh --test -context "Testing form interaction. 
+Feature: [description]
+Required fields: [list]
+Expected validation: [behavior]" "Fill the form with required fields and submit"
+```
+
+#### Form Testing (With Edge Cases)
+```bash
+./agent.sh --test -context "Testing form validation for [feature].
+Feature: [description]
+Required fields: [list]
+Validation rules: [rules]
+Edge cases: [cases]" "Try to submit the form with empty required fields and verify error message appears"
+
+./agent.sh --test -context "Testing form submission for [feature].
+Feature: [description]
+Expected behavior: [behavior]
+Success criteria: [criteria]" "Create a new item with all required fields and verify it appears in the list"
+```
+
+#### API Testing (With Context)
+```bash
+./agent.sh --test -context "Testing API integration for [feature].
+Feature: [description]
+API endpoint: [endpoint]
+Expected response: [response]
+Error handling: [handling]" "Test the API call by [specific action] and verify [expected result]"
+```
+
+#### File Operations (With Context)
+```bash
+./agent.sh --test -context "Testing file operations for [feature].
+Feature: [description]
+File types: [types]
+Size limits: [limits]
+Expected behavior: [behavior]" "Export data as JSON file and verify download starts"
+
+./agent.sh --test -context "Testing file upload for [feature].
+Feature: [description]
+Upload requirements: [requirements]
+Validation: [validation]" "Upload a file attachment and verify it appears in the interface"
+```
+
+## 🔍 Proactive Issue Detection
+
+**CRITICAL**: The agent must be proactive in detecting issues, not just reactive to user requests.
+
+### Issue Detection Checklist
+
+After implementing ANY feature, the agent MUST check:
+
+#### 1. Functional Integrity
+- [ ] **Primary Feature Works**: The requested feature functions as expected
+- [ ] **Related Features Still Work**: Existing features haven't been broken
+- [ ] **Data Consistency**: Database state is valid and consistent
+- [ ] **UI Responsiveness**: Interface updates correctly and remains responsive
+- [ ] **Error Handling**: Proper error states and messages are displayed
+
+#### 2. Domain Logic Validation
+- [ ] **Business Rules**: All domain-specific rules are followed
+- [ ] **Edge Cases**: Unusual scenarios are handled correctly
+- [ ] **Validation**: Input validation works as expected
+- [ ] **State Transitions**: Game/application state changes are logical
+- [ ] **Data Relationships**: Related data remains consistent
+
+#### 3. Integration Points
+- [ ] **Database Operations**: CRUD operations work correctly
+- [ ] **API Endpoints**: All endpoints respond appropriately
+- [ ] **Real-time Updates**: Live data synchronization works
+- [ ] **External Services**: Third-party integrations function
+- [ ] **Cross-Component Communication**: Components interact properly
+
+#### 4. User Experience
+- [ ] **Navigation**: Users can move through the app logically
+- [ ] **Feedback**: Users receive appropriate feedback for actions
+- [ ] **Performance**: App remains fast and responsive
+- [ ] **Accessibility**: Interface remains usable
+- [ ] **Mobile/Responsive**: Works across different screen sizes
+
+### Proactive Testing Commands
+
+```bash
+# Test the specific feature
+./agent.sh --test -context "[feature context]" "Test [specific functionality]"
+
+# Test related features that might be affected
+./agent.sh --test -context "[integration context]" "Test [related functionality] to ensure it still works"
+
+# Test edge cases
+./agent.sh --test -context "[edge case context]" "Test [edge case scenario] to verify proper handling"
+
+# Test data integrity
+./agent.sh --test -context "[data context]" "Verify that [data operations] work correctly and maintain consistency"
+
+# Test user flows end-to-end
+./agent.sh --test -context "[flow context]" "Complete the full [user flow] to ensure everything works together"
+```
+
+## 🎯 Testing Best Practices
+
+### 1. Always Use Context (MANDATORY)
+**NEVER run agent tests without comprehensive context. The agent needs to understand:**
+- What feature is being tested
+- How the feature works
+- What the expected behavior is
+- What edge cases to test
+- Project context and constraints
+
+**Good Context Example:**
+```bash
+./agent.sh --test -context "Testing task creation feature in task manager app.
+Feature: New task creation form with title, description, priority, and due date
+How to use: Click 'Add Task' button, fill form fields, click 'Create Task'
+Expected behavior: Task appears in 'To Do' column with correct data
+Edge cases: Empty title validation, invalid dates, special characters
+Project context: Next.js app with tRPC, Prisma database, real-time updates
+Technical details: Form uses React Hook Form, validation with Zod schema" "Create a new task with title 'Test Task', priority 'HIGH', and verify it appears correctly"
+```
+
+### 2. Be Specific and Measurable
+- ❌ "Test the form"
+- ✅ "Fill out the task creation form with title 'Test Task', priority 'HIGH', due date tomorrow, and verify it appears in the 'To Do' column with correct data"
+
+### 3. Test Incrementally (One Feature at a Time)
+```bash
+# Test basic functionality first
+./agent.sh --test -context "[context]" "Create a task with just title and verify it works"
+
+# Then test with more fields
+./agent.sh --test -context "[context]" "Create a task with title, priority, and due date"
+
+# Then test edge cases
+./agent.sh --test -context "[context]" "Try to create task with empty title and verify error message"
+```
+
+### 4. Test User Flows End-to-End
+```bash
+./agent.sh --test -context "[context]" "Complete full task lifecycle: create task 'Test Task', edit description to 'Updated description', change priority to 'URGENT', drag to 'In Progress' column, add comment 'Working on it', then mark as 'Done'"
+```
+
+### 5. Verify Results with Specific Criteria
+```bash
+./agent.sh --test -context "[context]" "Create a task and verify it appears in the correct column with correct title, priority badge, and due date formatting"
+./agent.sh --test -context "[context]" "Delete a task and confirm it's completely removed from all views and database"
+```
+
+## 🔄 Complete Development Workflow Examples
+
+### Example 1: Adding a New Feature - "Task Comments"
+
+**Step 1: Create Todo List**
+```bash
+# Use todo_write tool to create:
+# 1. Implement comment input component
+# 2. Add comment API endpoint
+# 3. Test comment creation with agent.sh
+# 4. Test comment display with agent.sh
+# 5. Test comment validation with agent.sh
+# 6. Test comment deletion with agent.sh
+# 7. Document any issues/solutions in knowledge system
+```
+
+**Step 2: Implement Comment Input Component**
+```typescript
+// Implement the component code
+```
+
+**Step 3: Test Comment Input with Agent**
+```bash
+cd circular
+./agent.sh --test -context "Testing new comment input feature in task manager.
+Feature: Comment input field added to task cards
+How to use: Click on a task card, type comment in input field, press Enter or click Add
+Expected behavior: Comment appears in task card comment section
+Edge cases: Empty comments, very long comments, special characters
+Project context: React component with tRPC API, real-time updates
+Technical details: Uses React Hook Form, validates comment length (max 500 chars)" "Click on the first task card, add a comment 'This is a test comment', and verify it appears in the comment section"
+```
+
+**Step 4: Handle Any Issues**
+If agent reports errors:
+```bash
+# Search knowledge base for similar issues
+./agent.sh --retrieve --input "React component not updating after form submission"
+./agent.sh --retrieve --tags react form-submission frontend
+
+# If found solution, implement it, otherwise create new solution
+# Test the fix
+./agent.sh --test -context "Testing fix for comment submission issue..." "Verify comment submission now works correctly"
+
+# Store successful solution
+./agent.sh --store --issue "Comment input not submitting properly - form state not updating" --solution "Fixed by ensuring proper form reset and state management in React Hook Form. Added useEffect to reset form after successful submission." --tags react form-submission frontend comment-feature
+```
+
+**Step 5: Continue with Next Todo Item**
+- Mark current todo as completed
+- Move to next item (API endpoint)
+- Repeat testing process
+
+### Example 2: Debugging an Existing Issue
+
+**Step 1: Agent Reports Error**
+```bash
+# Agent test fails with error: "Cannot read property 'title' of undefined"
+```
+
+**Step 2: Search Knowledge Base**
+```bash
+./agent.sh --retrieve --input "Cannot read property of undefined React"
+./agent.sh --retrieve --tags react undefined-error frontend
+```
+
+**Step 3: Analyze and Implement Solution**
+```bash
+# If knowledge base has solution, implement it
+# Otherwise, debug and create solution
+# Test the fix
+./agent.sh --test -context "Testing fix for undefined property error..." "Verify the task list now loads without errors"
+```
+
+**Step 4: Document Solution**
+```bash
+./agent.sh --store --issue "Task list component throwing 'Cannot read property title of undefined' error when tasks array is empty or loading" --solution "Added null checks and loading states. Wrapped task mapping in conditional render with tasks && tasks.length > 0. Added loading spinner component." --tags react undefined-error frontend task-list loading-state
+```
+
+## 🔧 Troubleshooting
+
+### Agent Server Issues
+```bash
+# Check if server is running
+curl http://localhost:3456/health
+
+# Restart agent server
+./agent.sh --run
+
+# Check server logs
+curl http://localhost:3456/logs
+```
+
+### Demo App Issues
+```bash
+# Reset database (if using database)
+cd demo-apps/[your-app-name]
+pnpm db:push
+pnpm db:seed
+
+# Check if app is running
+curl http://localhost:3000
+```
+
+### Common Errors
+- **"Agent server is not ready"**: Start the agent server first
+- **"Cannot connect to localhost:3000"**: Start the demo app first
+- **"Permission denied"**: Run `chmod +x agent.sh`
+- **"No API key found"**: Set up your API key in `.env` file
+- **"Computer Use Agent requires..."**: Use Anthropic or OpenAI API key (Cerebras doesn't support computer use)
+
+### Knowledge System Issues
+```bash
+# If store/retrieve commands fail, check database connection
+cd circular
+pnpm db:push
+
+# Check if embeddings service is running
+curl http://localhost:8000/health  # or your embeddings service URL
+
+# Reset knowledge base if needed
+pnpm db:reset
+```
+
+## 🚨 CRITICAL Rules for Development
+
+### 1. ALWAYS Create Todo Lists
+**MANDATORY**: Every feature request MUST start with creating a comprehensive todo list using `todo_write` tool.
+
+### 2. ALWAYS Test with Agent.sh
+**NEVER** consider a feature complete without testing it with agent.sh using comprehensive context.
+
+### 3. ALWAYS Use Context in Tests
+**NEVER** run agent tests without detailed context explaining the feature, how to use it, and what to expect.
+
+### 4. ALWAYS Document Solutions
+**MANDATORY**: Every successful solution to an issue MUST be stored in the knowledge system with appropriate tags.
+
+### 5. ALWAYS Search Knowledge Base First
+**BEFORE** implementing a solution, search the knowledge base for similar issues and solutions.
+
+### 6. ALWAYS Work Incrementally
+**ONE** todo item at a time. Complete implementation → Test → Fix → Document → Move to next item.
+
+### 7. ALWAYS Verify Results
+**NEVER** assume something works. Always verify with specific, measurable criteria.
+
+### 8. ALWAYS Check for Side Effects
+**MANDATORY**: After implementing any feature, the agent MUST:
+- Test the specific feature that was requested
+- **Proactively test related features** that might be affected
+- **Check for regressions** in existing functionality
+- **Verify data integrity** across the entire application
+- **Test edge cases** that might have been introduced
+
+### 9. ALWAYS Apply Domain Knowledge
+**CRITICAL**: The agent MUST understand and apply domain-specific logic:
+- **Read the webapp overview** before making changes
+- **Understand business rules** and validation requirements
+- **Consider real-world scenarios** and edge cases
+- **Apply domain expertise** to catch logical inconsistencies
+- **Think beyond the immediate request** to consider broader implications
+
+### 10. ALWAYS Test Integration Points
+**MANDATORY**: When making changes, test:
+- **Database operations** (create, read, update, delete)
+- **API endpoints** (request/response handling)
+- **UI components** (rendering, interactions, state)
+- **Real-time features** (updates, synchronization)
+- **External integrations** (third-party services, APIs)
+- **Cross-feature dependencies** (how features interact)
+
+## 📊 Knowledge System Best Practices
+
+### Tagging Strategy
+Use consistent tags for better searchability:
+
+**Technology Tags:**
+- `react`, `nextjs`, `typescript`, `nodejs`, `prisma`, `tRPC`
+
+**Component Tags:**
+- `frontend`, `backend`, `api`, `database`, `auth`, `ui`
+
+**Error Type Tags:**
+- `bug`, `performance`, `security`, `ui-error`, `api-error`, `validation`
+
+**Severity Tags:**
+- `critical`, `high`, `medium`, `low`
+
+**Feature Tags:**
+- `task-management`, `user-auth`, `file-upload`, `real-time`, `forms`
+
+### Search Strategies
+1. **Semantic Search**: Use natural language descriptions of the problem
+2. **Tag Search**: Combine technology + component + error type
+3. **Combined Search**: Use both semantic and tag search together
+
+### Storage Best Practices
+1. **Include Full Context**: Error messages, component names, API endpoints
+2. **Describe Complete Solution**: Step-by-step fix with code examples
+3. **Use Multiple Tags**: Technology, component, error type, severity
+4. **Include Metadata**: When relevant, add JSON metadata for additional context
+
+## 📊 Available Demo Apps
+
+### Task Manager (`demo-apps/task-manager/`)
+- **Features**: CRUD operations, drag-and-drop, file uploads, real-time updates, calendar view, knowledge base
+- **APIs**: tRPC + traditional REST APIs + WebSockets + Knowledge API
+- **Test Scenarios**: 50+ comprehensive test cases in `AGENT_TEST_SCENARIOS.md`
+- **Knowledge Integration**: Ollama store() and retrieve() functions for learning from agent activities
+
+### Example Test Commands (Always with Context)
+```bash
+# Basic CRUD with comprehensive context
+./agent.sh --test -context "Testing task creation in task manager app. Feature: Task creation form with title, description, priority, due date. How to use: Click 'Add Task' button, fill form, submit. Expected: Task appears in 'To Do' column. Edge cases: Empty title validation, invalid dates. Project: Next.js with tRPC and Prisma." "Create a new task with title 'Test Task', priority 'HIGH', and verify it appears correctly"
+
+# Drag and Drop with context
+./agent.sh --test -context "Testing drag and drop functionality. Feature: Drag tasks between columns (To Do, In Progress, Done). How to use: Click and drag task card to different column. Expected: Task moves to new column and status updates. Project: React with drag-and-drop library." "Drag the 'Test Task' from 'To Do' to 'In Progress' column and verify status updates"
+
+# File Operations with context
+./agent.sh --test -context "Testing file export functionality. Feature: Export all tasks as JSON file. How to use: Click export button in header. Expected: Browser downloads JSON file with all task data. Project: Next.js API route for file generation." "Click the export button and verify JSON file downloads with all task data"
+
+# Knowledge Base testing
+./agent.sh --test -context "Testing knowledge base integration. Feature: Store and retrieve knowledge about issues and solutions. How to use: Click brain icon, search for knowledge, store new entries. Expected: Search returns relevant results, new entries are stored. Project: Ollama integration with embeddings." "Click the knowledge base icon, search for 'task creation issues', and verify relevant results appear"
+```
+
+## 🎯 Development Workflow Summary
+
+**Every development session MUST follow this pattern:**
+
+1. **Receive Feature Request** → Create comprehensive todo list
+2. **Implement Sub-Feature** → Test with agent.sh (with context)
+3. **Handle Issues** → Search knowledge base → Implement solution → Test → Store solution
+4. **Continue** → Mark todo complete → Move to next item → Repeat
+5. **Complete Feature** → Final integration testing → Document in knowledge system
+
+**Key Principles:**
+- **Compartmentalize**: One feature at a time, one test at a time
+- **Context is King**: Always provide comprehensive context to agent
+- **Knowledge is Power**: Search before implementing, store after solving
+- **Verify Everything**: Never assume, always test and verify
+- **Document Success**: Every solution becomes future knowledge
+
+## 📋 Webapp Overview Maintenance
+
+### Creating New Webapp Overviews
+
+When creating a new webapp, the agent MUST:
+
+1. **Create WEBAPP_OVERVIEW.md** in the webapp root directory
+2. **Follow the template structure** provided above
+3. **Include domain-specific knowledge** relevant to the webapp's purpose
+4. **Document all core features** and their interactions
+5. **List common issues** and their solutions
+6. **Define testing strategies** specific to the domain
+
+### Updating Existing Overviews
+
+**MANDATORY**: Every time a feature is added, modified, or fixed:
+
+1. **Update the relevant sections** in WEBAPP_OVERVIEW.md
+2. **Add new edge cases** that were discovered
+3. **Document new issues** and their solutions
+4. **Update testing strategies** everytime something is successfully changed, check everything else in the webapp to make sure it didn't break anything else. This is VERY IMPORTANT.
+5. **Revise domain knowledge** if business rules change
+
+### Using Overviews for Context
+
+**CRITICAL**: Before implementing any feature:
+
+```bash
+# Read the webapp overview first
+cat [webapp-directory]/WEBAPP_OVERVIEW.md
+
+# Use overview context in all test commands
+./agent.sh --test -context "Testing [feature] in [webapp]. 
+Webapp Overview: [relevant sections from overview]
+Domain Knowledge: [applicable domain rules]
+Feature Context: [how this fits with existing features]
+Integration Points: [what other features this affects]" "Test [specific functionality]"
+```
+
+### Overview Quality Checklist
+
+Each WEBAPP_OVERVIEW.md should have:
+
+- [ ] **Clear purpose statement** - What the webapp does and why
+- [ ] **Complete feature list** - All major functionality documented
+- [ ] **Domain-specific knowledge** - Business rules and logic
+- [ ] **Technical architecture** - How it's built and structured
+- [ ] **Testing strategy** - How to verify it works correctly
+- [ ] **Common issues** - Known problems and solutions
+- [ ] **Recent updates** - What's changed and why
+
+## 📚 Additional Resources
+
+- `circular/AGENT_USAGE.md` - Detailed agent documentation
+- `demo-apps/task-manager/AGENT_TEST_SCENARIOS.md` - Comprehensive test scenarios
+- `demo-apps/task-manager/README.md` - Task manager app documentation
+- `demo-apps/baseball-tracker/WEBAPP_OVERVIEW.md` - Example webapp overview
+- `circular/KNOWLEDGE_SYSTEM.md` - Knowledge system documentation
+
+---
