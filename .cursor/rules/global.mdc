@@ -11,15 +11,8 @@ This project contains a comprehensive agent testing system in the `kaocular/` di
 
 ## 🚀 Quick Start
 
-### 0. Set up API Key (Required)
-```bash
-cd kaocular
-cp env.sample .env
-# Edit .env and add your API key:
-# ANTHROPIC_API_KEY=your_key_here (recommended)
-# OR OPENAI_API_KEY=your_key_here
-# OR CEREBRAS_API_KEY=your_key_here
-```
+### 0. No API Key Required
+This agent operates directly through Cursor. No separate LLM API keys are required.
 
 ### 1. Start the Agent Server
 ```bash
@@ -1466,8 +1459,6 @@ curl http://localhost:3000
 - **"Agent server is not ready"**: Start the agent server first
 - **"Cannot connect to localhost:3000"**: Start the demo app first
 - **"Permission denied"**: Run `chmod +x agent.sh`
-- **"No API key found"**: Set up your API key in `.env` file
-- **"Computer Use Agent requires..."**: Use Anthropic or OpenAI API key (Cerebras doesn't support computer use)
 
 ### Knowledge System Issues
 ```bash
