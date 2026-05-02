@@ -7,13 +7,13 @@ alwaysApply: true
 # 🤖 Agent System Usage Rules
 
 ## Overview
-This project contains a comprehensive agent testing system in the `circular/` directory and demo applications in `demo-apps/` for testing the agent. **CRITICAL**: Every feature implementation MUST be compartmentalized, tested with agent.sh, and documented in the knowledge system.
+This project contains a comprehensive agent testing system in the `kaocular/` directory and demo applications in `demo-apps/` for testing the agent. **CRITICAL**: Every feature implementation MUST be compartmentalized, tested with agent.sh, and documented in the knowledge system.
 
 ## 🚀 Quick Start
 
 ### 0. Set up API Key (Required)
 ```bash
-cd circular
+cd kaocular
 cp env.sample .env
 # Edit .env and add your API key:
 # ANTHROPIC_API_KEY=your_key_here (recommended)
@@ -23,7 +23,7 @@ cp env.sample .env
 
 ### 1. Start the Agent Server
 ```bash
-cd circular
+cd kaocular
 ./agent.sh --run
 ```
 This will:
@@ -43,7 +43,7 @@ pnpm dev
 
 ### 3. Run Agent Tests
 ```bash
-cd circular
+cd kaocular
 ./agent.sh --test "Your test instruction here"
 ```
 
@@ -232,7 +232,7 @@ Integration points: [what other features this affects]" "Test the [specific func
 **CRITICAL**: Every implementation MUST be tested with agent.sh before proceeding.
 
 ```bash
-cd circular
+cd kaocular
 ./agent.sh --test -context "Testing [specific feature] in [project context]. 
 Feature: [detailed description of what was implemented]
 How to use: [step-by-step instructions for the agent]
@@ -549,7 +549,7 @@ Technical details: Form uses React Hook Form, validation with Zod schema" "Creat
 
 **Step 3: Test Comment Input with Agent**
 ```bash
-cd circular
+cd kaocular
 ./agent.sh --test -context "Testing new comment input feature in task manager.
 Feature: Comment input field added to task cards
 How to use: Click on a task card, type comment in input field, press Enter or click Add
@@ -634,13 +634,11 @@ curl http://localhost:3000
 - **"Agent server is not ready"**: Start the agent server first
 - **"Cannot connect to localhost:3000"**: Start the demo app first
 - **"Permission denied"**: Run `chmod +x agent.sh`
-- **"No API key found"**: Set up your API key in `.env` file
-- **"Computer Use Agent requires..."**: Use Anthropic or OpenAI API key (Cerebras doesn't support computer use)
 
 ### Knowledge System Issues
 ```bash
 # If store/retrieve commands fail, check database connection
-cd circular
+cd kaocular
 pnpm db:push
 
 # Check if embeddings service is running
@@ -822,11 +820,11 @@ Each WEBAPP_OVERVIEW.md should have:
 
 ## 📚 Additional Resources
 
-- `circular/AGENT_USAGE.md` - Detailed agent documentation
+- `kaocular/AGENT_USAGE.md` - Detailed agent documentation
 - `demo-apps/task-manager/AGENT_TEST_SCENARIOS.md` - Comprehensive test scenarios
 - `demo-apps/task-manager/README.md` - Task manager app documentation
 - `demo-apps/baseball-tracker/WEBAPP_OVERVIEW.md` - Example webapp overview
-- `circular/KNOWLEDGE_SYSTEM.md` - Knowledge system documentation
+- `kaocular/KNOWLEDGE_SYSTEM.md` - Knowledge system documentation
 
 ---
 
@@ -841,13 +839,13 @@ alwaysApply: true
 # 🤖 Agent System Usage Rules
 
 ## Overview
-This project contains a comprehensive agent testing system in the `circular/` directory and demo applications in `demo-apps/` for testing the agent. **CRITICAL**: Every feature implementation MUST be compartmentalized, tested with agent.sh, and documented in the knowledge system.
+This project contains a comprehensive agent testing system in the `kaocular/` directory and demo applications in `demo-apps/` for testing the agent. **CRITICAL**: Every feature implementation MUST be compartmentalized, tested with agent.sh, and documented in the knowledge system.
 
 ## 🚀 Quick Start
 
 ### 0. Set up API Key (Required)
 ```bash
-cd circular
+cd kaocular
 cp env.sample .env
 # Edit .env and add your API key:
 # ANTHROPIC_API_KEY=your_key_here (recommended)
@@ -857,7 +855,7 @@ cp env.sample .env
 
 ### 1. Start the Agent Server
 ```bash
-cd circular
+cd kaocular
 ./agent.sh --run
 ```
 This will:
@@ -877,7 +875,7 @@ pnpm dev
 
 ### 3. Run Agent Tests
 ```bash
-cd circular
+cd kaocular
 ./agent.sh --test "Your test instruction here"
 ```
 
@@ -1066,7 +1064,7 @@ Integration points: [what other features this affects]" "Test the [specific func
 **CRITICAL**: Every implementation MUST be tested with agent.sh before proceeding.
 
 ```bash
-cd circular
+cd kaocular
 ./agent.sh --test -context "Testing [specific feature] in [project context]. 
 Feature: [detailed description of what was implemented]
 How to use: [step-by-step instructions for the agent]
@@ -1383,7 +1381,7 @@ Technical details: Form uses React Hook Form, validation with Zod schema" "Creat
 
 **Step 3: Test Comment Input with Agent**
 ```bash
-cd circular
+cd kaocular
 ./agent.sh --test -context "Testing new comment input feature in task manager.
 Feature: Comment input field added to task cards
 How to use: Click on a task card, type comment in input field, press Enter or click Add
@@ -1474,7 +1472,7 @@ curl http://localhost:3000
 ### Knowledge System Issues
 ```bash
 # If store/retrieve commands fail, check database connection
-cd circular
+cd kaocular
 pnpm db:push
 
 # Check if embeddings service is running
